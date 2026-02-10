@@ -11,7 +11,7 @@ export default function AuthPage() {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
-    const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+    const [message, setMessage] = useState<{ type: 'error' | 'success' | 'info', text: string } | null>(null);
     const router = useRouter();
 
     const handleAuth = async (e: React.FormEvent) => {
@@ -29,28 +29,26 @@ export default function AuthPage() {
                     email,
                     password,
                     options: {
-                        data: { full_name: name }
+                        data: { full_name: name },
                     }
                 });
+
                 if (error) throw error;
 
-                // Create profile entry
-                if (data.user) {
-                    await supabase.from('profiles').insert({
-                        id: data.user.id,
-                        name: name,
-                        goal: 10,
-                        pages_read: 0,
-                        verses_read: 0,
-                        completed_surahs: [],
-                        streak: 0
+                if (data.user && data.session) {
+                    // Logged in immediately
+                    router.push('/profile');
+                } else {
+                    // Confirmation required
+                    setMessage({
+                        type: 'info',
+                        text: 'Account created! Please check your email to confirm your account before logging in.'
                     });
                 }
-
-                setMessage({ type: 'success', text: 'Success! Check your email for confirmation.' });
             }
         } catch (error: any) {
-            setMessage({ type: 'error', text: error.message });
+            console.error('Auth error:', error);
+            setMessage({ type: 'error', text: error.message || 'An error occurred during authentication.' });
         } finally {
             setLoading(false);
         }
@@ -65,7 +63,7 @@ export default function AuthPage() {
                 </p>
 
                 {message && (
-                    <div className={`${styles.alert} ${message.type === 'error' ? styles.error : styles.success}`}>
+                    <div className={`${styles.alert} ${styles[message.type]}`}>
                         {message.text}
                     </div>
                 )}
@@ -101,6 +99,7 @@ export default function AuthPage() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             required
+                            minLength={6}
                         />
                     </div>
 

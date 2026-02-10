@@ -32,8 +32,19 @@ interface SocialContextType {
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined);
 
+const GUEST_USER: User = {
+    id: '1',
+    name: 'Guest User',
+    pagesRead: 0,
+    versesRead: 0,
+    completedSurahs: [],
+    goal: 10,
+    streak: 0,
+    lastActive: 'Just now'
+};
+
 export function SocialProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(GUEST_USER);
     const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
     const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
     const [activities, setActivities] = useState<Activity[]>([]);
@@ -49,20 +60,8 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         const initialize = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
-                await fetchProfile(session.user.id);
-                await fetchGroups(session.user.id);
-            } else {
-                // Default fallback for demo
-                setUser({
-                    id: '1',
-                    name: 'Guest User',
-                    pagesRead: 0,
-                    versesRead: 0,
-                    completedSurahs: [],
-                    goal: 10,
-                    streak: 0,
-                    lastActive: 'Just now'
-                });
+                await fetchProfileOrCreate(session.user);
+                await fetchGroups();
             }
         };
 
@@ -70,10 +69,11 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (session?.user) {
-                await fetchProfile(session.user.id);
-                await fetchGroups(session.user.id);
+                await fetchProfileOrCreate(session.user);
+                await fetchGroups();
             } else {
-                setUser(null);
+                setUser(GUEST_USER);
+                setCurrentGroup(null);
             }
         });
 
@@ -87,13 +87,35 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         const activitySub = supabase
             .channel(`activities:${currentGroup.id}`)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activities', filter: `group_id=eq.${currentGroup.id}` },
-                payload => setActivities(prev => [payload.new as Activity, ...prev]))
+                payload => {
+                    const newActivity = payload.new as any;
+                    setActivities(prev => [{
+                        id: newActivity.id,
+                        groupId: newActivity.group_id,
+                        userId: newActivity.user_id,
+                        userName: newActivity.user_name,
+                        action: newActivity.action,
+                        timestamp: newActivity.timestamp,
+                        isAiAnalysis: newActivity.is_ai_analysis
+                    }, ...prev]);
+                })
             .subscribe();
 
         const chatSub = supabase
             .channel(`chat:${currentGroup.id}`)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `group_id=eq.${currentGroup.id}` },
-                payload => setChatMessages(prev => [...prev, payload.new as ChatMessage]))
+                payload => {
+                    const newMsg = payload.new as any;
+                    setChatMessages(prev => [...prev, {
+                        id: newMsg.id,
+                        groupId: newMsg.group_id,
+                        userId: newMsg.user_id,
+                        userName: newMsg.user_name,
+                        text: newMsg.text,
+                        timestamp: newMsg.timestamp,
+                        isAi: newMsg.is_ai
+                    }]);
+                })
             .subscribe();
 
         fetchGroupData(currentGroup.id);
@@ -104,8 +126,24 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         };
     }, [currentGroup]);
 
-    const fetchProfile = async (userId: string) => {
-        const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const fetchProfileOrCreate = async (authUser: any) => {
+        let { data, error } = await supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+
+        // If profile doesn't exist, create it (safe fallback)
+        if (!data && !error) {
+            const { data: newData, error: insertError } = await supabase.from('profiles').insert({
+                id: authUser.id,
+                name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+                goal: 10,
+                pages_read: 0,
+                verses_read: 0,
+                completed_surahs: [],
+                streak: 0
+            }).select().single();
+
+            if (newData) data = newData;
+        }
+
         if (data) {
             setUser({
                 id: data.id,
@@ -120,7 +158,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const fetchGroups = async (userId: string) => {
+    const fetchGroups = async () => {
         const { data } = await supabase.from('groups').select('*');
         if (data) {
             const mappedGroups: Group[] = data.map((g: any) => ({
@@ -131,7 +169,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
                 inviteCode: g.invite_code,
                 createdBy: g.created_by,
                 createdAt: g.created_at,
-                members: [] // Members are fetched per-group in fetchGroupData
+                members: []
             }));
             setAvailableGroups(mappedGroups);
         }
@@ -154,7 +192,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
                 targetType: g.target_type,
                 targetValue: g.target_value,
                 postedBy: g.posted_by,
-                participantsCompleted: [] // completions tracked in goal_completions table, would need another join
+                participantsCompleted: []
             }));
             setGoals(mappedGoals);
         }
@@ -200,13 +238,13 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     };
 
     const setUserGoal = async (goal: number) => {
-        if (!user) return;
+        if (!user || user.id === '1') return;
         const { error } = await supabase.from('profiles').update({ goal }).eq('id', user.id);
         if (!error) setUser({ ...user, goal });
     };
 
     const createGroup = async (name: string, description: string, isPublic: boolean) => {
-        if (!user) return;
+        if (!user || user.id === '1') return;
         const inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
         const { data, error } = await supabase.from('groups').insert({
             name, description, is_public: isPublic, invite_code: inviteCode, created_by: user.id
@@ -214,8 +252,18 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
         if (data) {
             await supabase.from('group_members').insert({ group_id: data.id, user_id: user.id });
-            setAvailableGroups([data as any, ...availableGroups]);
-            setCurrentGroup(data as any);
+            const mapped: Group = {
+                id: data.id,
+                name: data.name,
+                description: data.description,
+                isPublic: data.is_public,
+                inviteCode: data.invite_code,
+                createdBy: data.created_by,
+                createdAt: data.created_at,
+                members: [user.id]
+            };
+            setAvailableGroups([mapped, ...availableGroups]);
+            setCurrentGroup(mapped);
             sendAiChatMessage(SOMALI_AI_MESSAGES.groupCreated(user.name, name), data.id);
         }
     };
@@ -229,9 +277,19 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         if (!error) {
             const { data: group } = await supabase.from('groups').select('*').eq('id', groupId).single();
             if (group) {
-                setCurrentGroup(group as any);
+                const mapped: Group = {
+                    id: group.id,
+                    name: group.name,
+                    description: group.description,
+                    isPublic: group.is_public,
+                    inviteCode: group.invite_code,
+                    createdBy: group.created_by,
+                    createdAt: group.created_at,
+                    members: []
+                };
+                setCurrentGroup(mapped);
                 sendAiChatMessage(SOMALI_AI_MESSAGES.memberJoined(user.name, group.name), groupId);
-                fetchGroups(user.id);
+                fetchGroups();
             }
         }
     };
@@ -250,8 +308,6 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
     const signOut = async () => {
         await supabase.auth.signOut();
-        setUser(null);
-        setCurrentGroup(null);
     };
 
     const addGoal = async (goalData: any) => {
@@ -261,7 +317,17 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         }).select().single();
 
         if (data) {
-            setGoals([data as any, ...goals]);
+            const mapped: GroupGoal = {
+                id: data.id,
+                groupId: data.group_id,
+                title: data.title,
+                description: data.description,
+                targetType: data.target_type,
+                targetValue: data.target_value,
+                postedBy: data.posted_by,
+                participantsCompleted: []
+            };
+            setGoals([mapped, ...goals]);
             sendAiChatMessage(`New Goal Posted: **${goalData.title}**. Who's ready to complete this? 🤲`, currentGroup.id);
         }
     };
@@ -309,7 +375,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        fetchProfile(user.id);
+        fetchProfileOrCreate({ id: user.id });
     };
 
     const leaderboardMembers = [...groupMembers, ...(user && user.id !== '1' ? [user] : [])]

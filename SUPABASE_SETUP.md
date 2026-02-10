@@ -9,10 +9,11 @@ Go to [supabase.com](https://supabase.com) and create a new project.
 Run the following SQL in the **SQL Editor** of your Supabase dashboard to create the tables:
 
 ```sql
--- Profiles table
+-- 1. Create Tables
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   name TEXT,
+  goal INTEGER DEFAULT 10,
   pages_read INTEGER DEFAULT 0,
   verses_read INTEGER DEFAULT 0,
   completed_surahs INTEGER[] DEFAULT '{}',
@@ -20,7 +21,6 @@ CREATE TABLE profiles (
   last_active TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Groups table
 CREATE TABLE groups (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
@@ -31,14 +31,12 @@ CREATE TABLE groups (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Group Members (many-to-many)
 CREATE TABLE group_members (
   group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   PRIMARY KEY (group_id, user_id)
 );
 
--- Goals table
 CREATE TABLE goals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
@@ -50,52 +48,68 @@ CREATE TABLE goals (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Goal Completions
-CREATE TABLE goal_completions (
-  goal_id UUID REFERENCES goals(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  completed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY (goal_id, user_id)
-);
-
--- Activities table
 CREATE TABLE activities (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id TEXT, -- Can be 'ai' or UUID
   user_name TEXT,
   action TEXT NOT NULL,
   is_ai_analysis BOOLEAN DEFAULT FALSE,
   timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Chat Messages table
 CREATE TABLE chat_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id TEXT, -- Can be 'ai' or UUID
   user_name TEXT,
   text TEXT NOT NULL,
   is_ai BOOLEAN DEFAULT FALSE,
   timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable Realtime for relevant tables
+-- 2. Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE activities;
 ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE goal_completions;
+
+-- 3. Set up RLS (Row Level Security)
+-- For simplicity in this demo, we'll allow all authenticated users to read/write.
+-- In a production app, you should restrict these further!
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Groups are viewable by everyone" ON groups FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can create groups" ON groups FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Memberships are viewable by everyone" ON group_members FOR SELECT USING (true);
+CREATE POLICY "Users can join groups" ON group_members FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+ALTER TABLE goals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Goals are viewable by everyone" ON goals FOR SELECT USING (true);
+CREATE POLICY "Members can create goals" ON goals FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Activities are viewable by everyone" ON activities FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can post activities" ON activities FOR INSERT WITH CHECK (auth.role() = 'authenticated' OR user_id = 'ai');
+
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Messages are viewable by everyone" ON chat_messages FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can post messages" ON chat_messages FOR INSERT WITH CHECK (auth.role() = 'authenticated' OR user_id = 'ai');
 ```
 
 ## 3. Environment Variables
-Create a file named `.env.local` in the root of this project and add your Supabase credentials:
-
+I have already set up your `.env.local`. If you need to change it:
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 ```
 
-## 4. Install Dependencies
-Run the following command in your terminal:
+## 4. Run the Dev Server
 ```bash
-npm install @supabase/supabase-js
+npm run dev
 ```

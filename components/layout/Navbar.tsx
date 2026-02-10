@@ -3,11 +3,18 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSocial } from '@/contexts/SocialContext';
+import { useState, useEffect } from 'react';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
     const pathname = usePathname();
     const { user, signOut } = useSocial();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // Close menu when route changes
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [pathname]);
 
     const isActive = (path: string) => pathname === path;
 
@@ -19,7 +26,18 @@ export default function Navbar() {
                     <span className={styles.logoText}>DeenTracker</span>
                 </Link>
 
-                <div className={styles.nav}>
+                {/* Mobile Hamburger */}
+                <button
+                    className={styles.hamburger}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    <div className={`${styles.bar} ${isMenuOpen ? styles.bar1 : ''}`}></div>
+                    <div className={`${styles.bar} ${isMenuOpen ? styles.bar2 : ''}`}></div>
+                    <div className={`${styles.bar} ${isMenuOpen ? styles.bar3 : ''}`}></div>
+                </button>
+
+                <div className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
                     <Link
                         href="/quran"
                         className={`${styles.navLink} ${isActive('/quran') ? styles.active : ''}`}
@@ -39,7 +57,7 @@ export default function Navbar() {
                                 href="/profile"
                                 className={`${styles.navLink} ${isActive('/profile') ? styles.active : ''}`}
                             >
-                                {user.name.split(' ')[0]}
+                                <span className={styles.userName}>{user.name.split(' ')[0]}</span>
                             </Link>
                             <button onClick={signOut} className={styles.logoutBtn}>
                                 Logout
@@ -48,13 +66,15 @@ export default function Navbar() {
                     ) : (
                         <Link
                             href="/auth"
-                            className={`${styles.loginBtn}`}
+                            className={styles.loginBtn}
                         >
                             Login
                         </Link>
                     )}
                 </div>
             </div>
+            {/* Overlay for mobile */}
+            {isMenuOpen && <div className={styles.overlay} onClick={() => setIsMenuOpen(false)}></div>}
         </nav>
     );
 }
