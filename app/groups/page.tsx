@@ -6,7 +6,7 @@ import { useState } from 'react';
 import styles from './page.module.css';
 
 export default function GroupsPage() {
-    const { user, currentGroup, availableGroups, groupMembers, activities, goals, joinGroup, joinGroupByCode, leaveGroup, createGroup, addGoal } = useSocial();
+    const { user, currentGroup, availableGroups, groupMembers, activities, goals, chatMessages, sendChatMessage, joinGroup, joinGroupByCode, leaveGroup, createGroup, addGoal } = useSocial();
     const [showGroupModal, setShowGroupModal] = useState(false);
     const [showGoalModal, setShowGoalModal] = useState(false);
     const [showInviteModal, setShowInviteModal] = useState(false);
@@ -20,6 +20,7 @@ export default function GroupsPage() {
     const [customGoalDesc, setCustomGoalDesc] = useState('');
     const [customGoalType, setCustomGoalType] = useState<'surah' | 'pages'>('pages');
     const [customGoalValue, setCustomGoalValue] = useState(1);
+    const [chatText, setChatText] = useState('');
 
     const sortedMembers = [...groupMembers, ...(user ? [user] : [])]
         .filter((v, i, a) => a.findIndex(v2 => (v2.id === v.id)) === i)
@@ -67,6 +68,14 @@ export default function GroupsPage() {
             joinGroupByCode(inviteCode);
             setInviteCode('');
             setShowJoinByCodeModal(false);
+        }
+    };
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (chatText.trim()) {
+            sendChatMessage(chatText);
+            setChatText('');
         }
     };
 
@@ -353,14 +362,15 @@ export default function GroupsPage() {
                                 </div>
                                 <p className={styles.goalDesc}>{goal.description}</p>
                                 <div className={styles.participantsRow}>
-                                    {goal.participantsCompleted.slice(0, 5).map((uid, i) => (
-                                        <div key={uid} className={styles.miniAvatar} style={{ zIndex: 10 - i }}>
-                                            {uid === user?.id ? 'Y' : sortedMembers.find(m => m.id === uid)?.name.charAt(0) || '?'}
-                                        </div>
-                                    ))}
-                                    {goal.participantsCompleted.length > 5 && (
-                                        <span className={styles.moreCount}>+{goal.participantsCompleted.length - 5}</span>
-                                    )}
+                                    {goal.participantsCompleted.map((uid) => {
+                                        const member = sortedMembers.find(m => m.id === uid);
+                                        return (
+                                            <div key={uid} className={styles.participantTag}>
+                                                <span className={styles.checkIcon}>✓</span>
+                                                {uid === user?.id ? 'You' : member?.name || 'User'}
+                                            </div>
+                                        );
+                                    })}
                                     {goal.participantsCompleted.length === 0 && (
                                         <span className={styles.emptyParticipants}>Be the first to complete!</span>
                                     )}
@@ -420,6 +430,37 @@ export default function GroupsPage() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Group Chat */}
+                <div className="card">
+                    <h2 className={styles.cardTitle}>💬 Group Discussion (AI Facilitated)</h2>
+                    <div className={styles.chatContainer}>
+                        <div className={styles.messageList}>
+                            {chatMessages.map((msg) => (
+                                <div
+                                    key={msg.id}
+                                    className={`${styles.messageItem} ${msg.isAi ? styles.aiMessage : ''} ${msg.userId === user?.id ? styles.ownMessage : ''}`}
+                                >
+                                    <div className={styles.messageHeader}>
+                                        <span className={styles.messageUser}>{msg.userName}</span>
+                                        <span className={styles.messageTime}>{msg.timestamp}</span>
+                                    </div>
+                                    <div className={styles.messageText}>{msg.text}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <form className={styles.chatInputRow} onSubmit={handleSendMessage}>
+                            <input
+                                type="text"
+                                placeholder="Message your group..."
+                                value={chatText}
+                                onChange={(e) => setChatText(e.target.value)}
+                                className={styles.chatInput}
+                            />
+                            <button type="submit" className="btn btn-primary">Send</button>
+                        </form>
                     </div>
                 </div>
             </div>

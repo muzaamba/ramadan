@@ -64,6 +64,16 @@ export interface Group {
     inviteCode: string;
 }
 
+export interface ChatMessage {
+    id: string;
+    groupId: string;
+    userId: string;
+    userName: string;
+    text: string;
+    timestamp: string;
+    isAi?: boolean;
+}
+
 export const PRESET_GOALS = [
     { title: 'Read Surah Al-Kahf', description: 'Friday Sunnah', targetType: 'surah' as const, targetValue: 18 },
     { title: 'Read Surah Yasin', description: 'Heart of the Quran', targetType: 'surah' as const, targetValue: 36 },

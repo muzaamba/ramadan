@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Activity, GroupGoal, Group, PRESET_GOALS, SOMALI_AI_MESSAGES } from '@/types';
+import { User, Activity, GroupGoal, Group, PRESET_GOALS, SOMALI_AI_MESSAGES, ChatMessage } from '@/types';
 
 interface LogData {
     pages: number;
@@ -24,6 +24,8 @@ interface SocialContextType {
     leaveGroup: () => void;
     createGroup: (name: string, description: string, isPublic: boolean) => void;
     addGoal: (goal: Omit<GroupGoal, 'id' | 'groupId' | 'participantsCompleted' | 'postedBy'>) => void;
+    chatMessages: ChatMessage[];
+    sendChatMessage: (text: string) => void;
 }
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined);
@@ -71,10 +73,14 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         { id: '1', groupId: 'g1', userId: '2', userName: 'Ali', action: 'read 5 pages', timestamp: '2m ago' },
         { id: '2', groupId: 'g1', userId: '3', userName: 'Fatima', action: 'finished Surah Al-Kahf', timestamp: '1h ago' },
     ]);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+        { id: '1', groupId: 'g1', userId: 'ai', userName: 'Deen AI', text: 'Ramadaan Kariim! Soo dhawaada dhamaantiis. Let\'s support each other this month! 🌙', timestamp: '1h ago', isAi: true }
+    ]);
 
     // Derived states
     const currentGroupGoals = goals.filter(g => g.groupId === currentGroup?.id);
     const currentGroupActivities = activities.filter(a => a.groupId === currentGroup?.id);
+    const currentGroupMessages = chatMessages.filter(m => m.groupId === currentGroup?.id);
     const currentGroupMembers = FAKE_USERS.filter(u => currentGroup?.members.includes(u.id));
 
     useEffect(() => {
@@ -208,6 +214,40 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             action: `posted a new goal: ${goalData.title}`,
             timestamp: 'Just now'
         }, ...prev]);
+
+        // AI Chat Post
+        sendAiChatMessage(`New Goal Posted: **${goalData.title}**. Who's ready to complete this? 🤲`, currentGroup?.id || '');
+    };
+
+    const sendAiChatMessage = (text: string, groupId: string) => {
+        setChatMessages(prev => [...prev, {
+            id: Math.random().toString(36).substring(7),
+            groupId,
+            userId: 'ai',
+            userName: 'Deen AI',
+            text,
+            timestamp: 'Just now',
+            isAi: true
+        }]);
+    };
+
+    const sendChatMessage = (text: string) => {
+        if (!user || !currentGroup) return;
+        setChatMessages(prev => [...prev, {
+            id: Math.random().toString(36).substring(7),
+            groupId: currentGroup.id,
+            userId: user.id,
+            userName: user.name,
+            text,
+            timestamp: 'Just now'
+        }]);
+
+        // Simple AI auto-response logic for engagement
+        if (text.toLowerCase().includes('inshalla') || text.toLowerCase().includes('ameen')) {
+            setTimeout(() => {
+                sendAiChatMessage(`Aamiin! Allah ha inaga wada aqbalo dadaalka aan samaynayno.`, currentGroup.id);
+            }, 1000);
+        }
     };
 
     const logProgress = ({ pages, surahId, surahName, versesCount = 0 }: LogData) => {
@@ -292,6 +332,9 @@ export function SocialProvider({ children }: { children: ReactNode }) {
                         timestamp: 'Just now',
                         isAiAnalysis: true
                     });
+
+                    // AI Chat Message for goal completion
+                    sendAiChatMessage(`Mashaa Allah! **${user.name}** has just completed the goal: *${completedGoal.title}*! 🎉`, group.id);
                 }
             }
             newGroupActivities.push(...groupActivities);
@@ -314,7 +357,9 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             joinGroupByCode,
             leaveGroup,
             createGroup,
-            addGoal
+            addGoal,
+            chatMessages: currentGroupMessages,
+            sendChatMessage
         }}>
             {children}
         </SocialContext.Provider>
