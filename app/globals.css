@@ -145,18 +145,6 @@ h3 {
   font-size: 1.5rem;
 }
 
-h4 {
-  font-size: 1.25rem;
-}
-
-h5 {
-  font-size: 1.125rem;
-}
-
-h6 {
-  font-size: 1rem;
-}
-
 p {
   margin: 0;
   line-height: var(--line-height-relaxed);
@@ -172,11 +160,13 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* Container */
+/* Global Container System */
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
+  /* Reduced for mobile edge-to-edge feel */
 }
 
 @media (min-width: 768px) {
@@ -185,108 +175,17 @@ a:hover {
   }
 }
 
-/* Card Component */
-.card {
-  background-color: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 2rem;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-/* Button System */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  background-color: var(--surface-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-
-.btn:hover {
-  background-color: var(--sand);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-}
-
-.btn-secondary {
-  background-color: var(--accent-light);
-  color: var(--accent-hover);
-  border: 1px solid var(--accent);
-}
-
-.btn-secondary:hover {
-  background-color: var(--accent);
-  color: white;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.w-full {
-  width: 100%;
-}
-
 /* Utility Classes */
 .text-secondary {
   color: var(--text-secondary);
-}
-
-.text-tertiary {
-  color: var(--text-tertiary);
 }
 
 .text-center {
   text-align: center;
 }
 
-.font-serif {
-  font-family: var(--font-serif);
-}
-
-/* Focus States */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Selection */
-::selection {
-  background-color: var(--primary-light);
-  color: var(--primary);
+.w-full {
+  width: 100%;
 }
 
 /* Scrollbar */

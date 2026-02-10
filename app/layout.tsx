@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Amiri } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import "./globals.css";
+import { SocialProvider } from "@/contexts/SocialContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const amiri = Amiri({
@@ -15,8 +16,6 @@ export const metadata: Metadata = {
   description: "Track your prayers, reading, and habits during Ramadan and beyond.",
 };
 
-import { SocialProvider } from "@/contexts/SocialContext";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +26,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${amiri.variable}`}>
         <SocialProvider>
           <Navbar />
-          <main className="container">
+          <main>
             {children}
           </main>
         </SocialProvider>
