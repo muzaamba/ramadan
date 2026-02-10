@@ -33,6 +33,7 @@ export interface User {
 
 export interface GroupGoal {
     id: string;
+    groupId: string;
     title: string;
     description: string;
     targetType: 'surah' | 'pages';
@@ -44,6 +45,7 @@ export interface GroupGoal {
 
 export interface Activity {
     id: string;
+    groupId: string;
     userId: string;
     userName: string;
     action: string; // "read 5 pages", "finished Surah Yasin"

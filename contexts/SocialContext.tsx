@@ -23,7 +23,7 @@ interface SocialContextType {
     joinGroupByCode: (inviteCode: string) => void;
     leaveGroup: () => void;
     createGroup: (name: string, description: string, isPublic: boolean) => void;
-    addGoal: (goal: Omit<GroupGoal, 'id' | 'participantsCompleted' | 'postedBy'>) => void;
+    addGoal: (goal: Omit<GroupGoal, 'id' | 'groupId' | 'participantsCompleted' | 'postedBy'>) => void;
 }
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined);
@@ -37,6 +37,7 @@ const FAKE_USERS: User[] = [
 const INITIAL_GOALS: GroupGoal[] = [
     {
         id: 'g1',
+        groupId: 'g1',
         title: 'Friday Sunnah',
         description: 'Read Surah Al-Kahf',
         targetType: 'surah',
@@ -67,9 +68,14 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     const [groupMembers, setGroupMembers] = useState<User[]>(FAKE_USERS);
     const [goals, setGoals] = useState<GroupGoal[]>(INITIAL_GOALS);
     const [activities, setActivities] = useState<Activity[]>([
-        { id: '1', userId: '2', userName: 'Ali', action: 'read 5 pages', timestamp: '2m ago' },
-        { id: '2', userId: '3', userName: 'Fatima', action: 'finished Surah Al-Kahf', timestamp: '1h ago' },
+        { id: '1', groupId: 'g1', userId: '2', userName: 'Ali', action: 'read 5 pages', timestamp: '2m ago' },
+        { id: '2', groupId: 'g1', userId: '3', userName: 'Fatima', action: 'finished Surah Al-Kahf', timestamp: '1h ago' },
     ]);
+
+    // Derived states
+    const currentGroupGoals = goals.filter(g => g.groupId === currentGroup?.id);
+    const currentGroupActivities = activities.filter(a => a.groupId === currentGroup?.id);
+    const currentGroupMembers = FAKE_USERS.filter(u => currentGroup?.members.includes(u.id));
 
     useEffect(() => {
         // Run once on mount to load persisted user
@@ -122,6 +128,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         // AI Message in Somali
         setActivities(prev => [{
             id: Date.now().toString(),
+            groupId: newGroup.id,
             userId: 'ai',
             userName: 'Deen AI',
             action: SOMALI_AI_MESSAGES.groupCreated(user.name, name),
@@ -129,6 +136,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             isAiAnalysis: true
         }, {
             id: (Date.now() + 1).toString(),
+            groupId: newGroup.id,
             userId: user.id,
             userName: user.name,
             action: `created a new group: ${name}`,
@@ -152,6 +160,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         // AI Message in Somali
         setActivities(prev => [{
             id: Date.now().toString(),
+            groupId: group.id,
             userId: 'ai',
             userName: 'Deen AI',
             action: SOMALI_AI_MESSAGES.memberJoined(user.name, group.name),
@@ -180,10 +189,11 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         setCurrentGroup(null);
     };
 
-    const addGoal = (goalData: Omit<GroupGoal, 'id' | 'participantsCompleted' | 'postedBy'>) => {
+    const addGoal = (goalData: Omit<GroupGoal, 'id' | 'groupId' | 'participantsCompleted' | 'postedBy'>) => {
         const newGoal: GroupGoal = {
             ...goalData,
             id: Date.now().toString(),
+            groupId: currentGroup?.id || '',
             postedBy: 'admin', // Demo: Assume current user is admin/admin posted
             participantsCompleted: []
         };
@@ -192,6 +202,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         // Add activity
         setActivities(prev => [{
             id: Date.now().toString(),
+            groupId: currentGroup?.id || '',
             userId: 'admin',
             userName: 'Admin',
             action: `posted a new goal: ${goalData.title}`,
@@ -242,44 +253,51 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             setGoals(updatedGoals);
         }
 
-        // Add User Activity
-        const newActivities: Activity[] = [{
-            id: Date.now().toString(),
-            userId: user.id,
-            userName: user.name,
-            action: surahName ? `read Surah ${surahName} (${versesCount} verses)` : `read ${pages} pages`,
-            timestamp: 'Just now'
-        }];
+        // Add User Activity for ALL groups the user is in
+        const userGroups = availableGroups.filter(g => g.members.includes(user.id));
+        const newGroupActivities: Activity[] = [];
 
-        // AI Logic: Analyze the progress
-        // 1. Check for Surah completion - Somali AI
-        if (surahName && versesCount > 20) {
-            newActivities.unshift({
-                id: (Date.now() + 1).toString(),
-                userId: 'ai',
-                userName: 'Deen AI',
-                action: SOMALI_AI_MESSAGES.surahCompleted(user.name, surahName, versesCount),
-                timestamp: 'Just now',
-                isAiAnalysis: true
-            });
-        }
+        userGroups.forEach(group => {
+            const groupActivities: Activity[] = [{
+                id: Math.random().toString(36).substring(7),
+                groupId: group.id,
+                userId: user.id,
+                userName: user.name,
+                action: surahName ? `read Surah ${surahName} (${versesCount} verses)` : `read ${pages} pages`,
+                timestamp: 'Just now'
+            }];
 
-        // 2. Check for Goals - Somali AI
-        if (completedGoalIds.length > 0) {
-            const completedGoal = goals.find(g => g.id === completedGoalIds[0]);
-            if (completedGoal) {
-                newActivities.unshift({
-                    id: (Date.now() + 2).toString(),
+            // AI Logic per group
+            if (surahName && versesCount > 20) {
+                groupActivities.unshift({
+                    id: Math.random().toString(36).substring(7),
+                    groupId: group.id,
                     userId: 'ai',
                     userName: 'Deen AI',
-                    action: SOMALI_AI_MESSAGES.goalCompleted(user.name, completedGoal.title),
+                    action: SOMALI_AI_MESSAGES.surahCompleted(user.name, surahName, versesCount),
                     timestamp: 'Just now',
                     isAiAnalysis: true
                 });
             }
-        }
 
-        setActivities(prev => [...newActivities, ...prev]);
+            if (completedGoalIds.length > 0) {
+                const completedGoal = goals.find(g => g.id === completedGoalIds[0] && g.groupId === group.id);
+                if (completedGoal) {
+                    groupActivities.unshift({
+                        id: Math.random().toString(36).substring(7),
+                        groupId: group.id,
+                        userId: 'ai',
+                        userName: 'Deen AI',
+                        action: SOMALI_AI_MESSAGES.goalCompleted(user.name, completedGoal.title),
+                        timestamp: 'Just now',
+                        isAiAnalysis: true
+                    });
+                }
+            }
+            newGroupActivities.push(...groupActivities);
+        });
+
+        setActivities(prev => [...newGroupActivities, ...prev]);
     };
 
     return (
@@ -287,9 +305,9 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             user,
             currentGroup,
             availableGroups,
-            groupMembers,
-            activities,
-            goals,
+            groupMembers: currentGroupMembers,
+            activities: currentGroupActivities,
+            goals: currentGroupGoals,
             setUserGoal,
             logProgress,
             joinGroup,
