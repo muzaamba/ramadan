@@ -87,8 +87,8 @@ export default function GroupsPage() {
                     <div className={styles.groupBadge}>
                         {currentGroup?.isPublic ? '🌍 Public Group' : '🔒 Private Group'}
                     </div>
-                    <h1 className={styles.heroTitle}>{currentGroup?.name || 'No Group Selected'}</h1>
-                    <p className={styles.heroSubtitle}>{currentGroup?.description || 'Join or create a group to start your journey'}</p>
+                    <h1 className={styles.heroTitle}>{currentGroup?.name || 'Ramadan Circles'}</h1>
+                    <p className={styles.heroSubtitle}>{currentGroup?.description || 'Learn and grow together with the community'}</p>
                     <div className={styles.heroStats}>
                         <div className={styles.statBox}>
                             <span className={styles.statNumber}>{currentGroup?.members.length || 0}</span>
@@ -96,11 +96,11 @@ export default function GroupsPage() {
                         </div>
                         <div className={styles.statBox}>
                             <span className={styles.statNumber}>{goals.length}</span>
-                            <span className={styles.statLabel}>Active Goals</span>
+                            <span className={styles.statLabel}>Goals</span>
                         </div>
                         <div className={styles.statBox}>
                             <span className={styles.statNumber}>{sortedMembers.reduce((sum, m) => sum + m.pagesRead, 0)}</span>
-                            <span className={styles.statLabel}>Total Pages</span>
+                            <span className={styles.statLabel}>Pages</span>
                         </div>
                     </div>
                 </div>
@@ -109,14 +109,14 @@ export default function GroupsPage() {
                         + New Goal
                     </button>
                     {currentGroup && (
-                        <button className="btn btn-secondary" onClick={() => setShowInviteModal(true)}>
+                        <button className="btn btn-primary" onClick={() => setShowInviteModal(true)} style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
                             📤 Share Invite
                         </button>
                     )}
-                    <button className="btn" onClick={() => setShowGroupModal(true)}>
-                        Switch Group
+                    <button className="btn btn-primary" onClick={() => setShowGroupModal(true)} style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                        🔄 Switch Group
                     </button>
-                    <button className="btn" onClick={() => setShowJoinByCodeModal(true)}>
+                    <button className="btn btn-primary" onClick={() => setShowJoinByCodeModal(true)} style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
                         🔗 Join by Code
                     </button>
                     {currentGroup && (
@@ -127,343 +127,181 @@ export default function GroupsPage() {
                 </div>
             </div>
 
-            {/* Invite Modal */}
+            <div className="container">
+                {/* Active Goals Section */}
+                {goals.length > 0 && (
+                    <div className={styles.section}>
+                        <h2 className={styles.sectionTitle}>🎯 Active Goals</h2>
+                        <div className={styles.goalsGrid}>
+                            {goals.map(goal => (
+                                <div key={goal.id} className={styles.goalCard}>
+                                    <div className={styles.goalHeader}>
+                                        <h3>{goal.title}</h3>
+                                        <span className={styles.goalBadge}>{goal.participantsCompleted.length} ✓</span>
+                                    </div>
+                                    <p className={styles.goalDesc}>{goal.description}</p>
+                                    <div className={styles.participantsRow}>
+                                        {goal.participantsCompleted.map((uid) => {
+                                            const member = sortedMembers.find(m => m.id === uid);
+                                            return (
+                                                <div key={uid} className={styles.participantTag}>
+                                                    <span className={styles.checkIcon}>✓</span>
+                                                    {uid === user?.id ? 'You' : member?.name || 'User'}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Main Content Grid */}
+                <div className={styles.grid}>
+                    {/* Leaderboard */}
+                    <div className="card">
+                        <h2 className={styles.cardTitle}>🏆 Leaderboard</h2>
+                        <div className={styles.leaderboard}>
+                            {sortedMembers.slice(0, 10).map((member, index) => (
+                                <div key={member.id} className={styles.leaderRow}>
+                                    <div className={styles.rank}>#{index + 1}</div>
+                                    <div className={styles.avatar}>
+                                        {member.name.charAt(0)}
+                                    </div>
+                                    <div className={styles.info}>
+                                        <div className={styles.name}>
+                                            {member.name}
+                                            {member.id === user?.id && <span className={styles.youTag}>(You)</span>}
+                                        </div>
+                                        <div className={styles.stats}>
+                                            {member.pagesRead} pages • {member.versesRead || 0} verses
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Group Chat */}
+                    <div className="card">
+                        <h2 className={styles.cardTitle}>💬 Group Hub</h2>
+                        <div className={styles.chatContainer}>
+                            <div className={styles.messageList}>
+                                {chatMessages.map((msg) => (
+                                    <div
+                                        key={msg.id}
+                                        className={`${styles.messageItem} ${msg.isAi ? styles.aiMessage : ''} ${msg.userId === user?.id ? styles.ownMessage : ''}`}
+                                    >
+                                        <div className={styles.messageHeader}>
+                                            <span className={styles.messageUser}>{msg.userName}</span>
+                                        </div>
+                                        <div className={styles.messageText}>{msg.text}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <form className={styles.chatInputRow} onSubmit={handleSendMessage}>
+                                <input
+                                    type="text"
+                                    placeholder="Message your group..."
+                                    value={chatText}
+                                    onChange={(e) => setChatText(e.target.value)}
+                                    className={styles.chatInput}
+                                />
+                                <button type="submit" className="btn btn-primary" style={{ width: 'auto' }}>Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Modals - Standardized */}
             {showInviteModal && currentGroup && (
                 <div className={styles.modal} onClick={() => setShowInviteModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2>📤 Share Group Invite</h2>
+                            <h2>Share Group</h2>
                             <button className={styles.closeBtn} onClick={() => setShowInviteModal(false)}>×</button>
                         </div>
-                        <p className={styles.modalDesc}>Share this link or code with friends to invite them to {currentGroup.name}</p>
-
                         <div className={styles.inviteBox}>
-                            <label>Invite Code</label>
-                            <div className={styles.codeDisplay}>
-                                <code>{currentGroup.inviteCode}</code>
-                                <button className="btn btn-primary" onClick={() => {
-                                    navigator.clipboard.writeText(currentGroup.inviteCode);
-                                    setCopiedCode(true);
-                                    setTimeout(() => setCopiedCode(false), 2000);
-                                }}>
-                                    {copiedCode ? '✓ Copied!' : 'Copy'}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={styles.inviteBox}>
-                            <label>Invite Link</label>
-                            <div className={styles.linkDisplay}>
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={`${window.location.origin}/groups?invite=${currentGroup.inviteCode}`}
-                                    className={styles.linkInput}
-                                />
-                                <button className="btn btn-secondary" onClick={handleCopyInviteLink}>
-                                    {copiedCode ? '✓ Copied!' : 'Copy Link'}
-                                </button>
-                            </div>
+                            <code>{currentGroup.inviteCode}</code>
+                            <button className="btn btn-primary" onClick={() => {
+                                navigator.clipboard.writeText(currentGroup.inviteCode);
+                                setCopiedCode(true);
+                                setTimeout(() => setCopiedCode(false), 2000);
+                            }} style={{ marginTop: '1rem' }}>
+                                {copiedCode ? '✓ Copied!' : 'Copy Code'}
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Join by Code Modal */}
-            {showJoinByCodeModal && (
-                <div className={styles.modal} onClick={() => setShowJoinByCodeModal(false)}>
-                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>🔗 Join Group by Code</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowJoinByCodeModal(false)}>×</button>
-                        </div>
-                        <p className={styles.modalDesc}>Enter the invite code shared by your friend</p>
-                        <input
-                            type="text"
-                            placeholder="Enter invite code (e.g., ABC123XY)"
-                            value={inviteCode}
-                            onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                            className={styles.input}
-                            autoFocus
-                        />
-                        <button className="btn btn-primary w-full" onClick={handleJoinByCode}>
-                            Join Group
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Group Management Modal */}
             {showGroupModal && (
                 <div className={styles.modal} onClick={() => setShowGroupModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2>Manage Groups</h2>
+                            <h2>Groups</h2>
                             <button className={styles.closeBtn} onClick={() => setShowGroupModal(false)}>×</button>
                         </div>
-
-                        <div className={styles.section}>
-                            <h3>Available Groups</h3>
-                            <div className={styles.groupList}>
-                                {availableGroups.filter(g => g.isPublic || g.members.includes(user?.id || '')).map(group => (
-                                    <div key={group.id} className={styles.groupCard}>
-                                        <div className={styles.groupCardHeader}>
-                                            <div>
-                                                <h4>{group.name}</h4>
-                                                <p className={styles.groupMeta}>
-                                                    {group.isPublic ? '🌍 Public' : '🔒 Private'} • {group.members.length} members
-                                                </p>
-                                            </div>
-                                            <button
-                                                className={currentGroup?.id === group.id ? 'btn' : 'btn btn-primary'}
-                                                onClick={() => {
-                                                    if (currentGroup?.id !== group.id) {
-                                                        joinGroup(group.id);
-                                                        setShowGroupModal(false);
-                                                    }
-                                                }}
-                                                disabled={currentGroup?.id === group.id}
-                                            >
-                                                {currentGroup?.id === group.id ? '✓ Current' : 'Join'}
-                                            </button>
-                                        </div>
-                                        <p className={styles.groupDesc}>{group.description}</p>
+                        <div className={styles.groupList}>
+                            {availableGroups.map(group => (
+                                <div key={group.id} className={styles.groupCard}>
+                                    <div className={styles.groupCardHeader}>
+                                        <h4>{group.name}</h4>
+                                        <button
+                                            className="btn btn-primary"
+                                            style={{ width: 'auto', padding: '0.5rem 1rem' }}
+                                            onClick={() => { joinGroup(group.id); setShowGroupModal(false); }}
+                                            disabled={currentGroup?.id === group.id}
+                                        >
+                                            {currentGroup?.id === group.id ? 'Active' : 'Switch'}
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <hr className={styles.divider} />
-
-                        <div className={styles.section}>
-                            <h3>Create New Group</h3>
-                            <input
-                                type="text"
-                                placeholder="Group Name"
-                                value={newGroupName}
-                                onChange={(e) => setNewGroupName(e.target.value)}
-                                className={styles.input}
-                            />
-                            <textarea
-                                placeholder="Description (optional)"
-                                value={newGroupDesc}
-                                onChange={(e) => setNewGroupDesc(e.target.value)}
-                                className={styles.textarea}
-                                rows={3}
-                            />
-                            <label className={styles.checkboxLabel}>
-                                <input
-                                    type="checkbox"
-                                    checked={isPublic}
-                                    onChange={(e) => setIsPublic(e.target.checked)}
-                                />
-                                <span>Make this group public (anyone can join)</span>
-                            </label>
-                            <button className="btn btn-primary w-full" onClick={handleCreateGroup}>
-                                Create Group
-                            </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Goal Selection Modal */}
             {showGoalModal && (
                 <div className={styles.modal} onClick={() => setShowGoalModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2>Post a New Goal</h2>
+                            <h2>New Goal</h2>
                             <button className={styles.closeBtn} onClick={() => setShowGoalModal(false)}>×</button>
                         </div>
-
-                        <div className={styles.section}>
-                            <h3>Pre-made Goals</h3>
-                            <p className={styles.modalDesc}>Quickly select from our recommended Ramadan goals</p>
-                            <div className={styles.presetGoals}>
-                                {PRESET_GOALS.map((preset, idx) => (
-                                    <button
-                                        key={idx}
-                                        className={styles.presetGoalBtn}
-                                        onClick={() => handleSelectPresetGoal(preset)}
-                                    >
-                                        <h4>{preset.title}</h4>
-                                        <p>{preset.description}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <hr className={styles.divider} />
-
-                        <div className={styles.section}>
-                            <h3>Create Custom Goal</h3>
-                            <p className={styles.modalDesc}>Define a specific goal for your group members</p>
-                            <div className={styles.formGroup}>
-                                <label>Goal Title</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g., Read Surah Ar-Rahman"
-                                    value={customGoalTitle}
-                                    onChange={(e) => setCustomGoalTitle(e.target.value)}
-                                    className={styles.input}
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label>Description</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g., Let's all read this beautiful Surah together"
-                                    value={customGoalDesc}
-                                    onChange={(e) => setCustomGoalDesc(e.target.value)}
-                                    className={styles.input}
-                                />
-                            </div>
-                            <div className={styles.formRow}>
-                                <div className={styles.formGroup} style={{ flex: 1 }}>
-                                    <label>Goal Type</label>
-                                    <select
-                                        value={customGoalType}
-                                        onChange={(e) => setCustomGoalType(e.target.value as 'surah' | 'pages')}
-                                        className={styles.input}
-                                    >
-                                        <option value="pages">Pages</option>
-                                        <option value="surah">Specific Surah ID</option>
-                                    </select>
-                                </div>
-                                <div className={styles.formGroup} style={{ flex: 1 }}>
-                                    <label>{customGoalType === 'pages' ? 'Page Count' : 'Surah ID'}</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={customGoalValue}
-                                        onChange={(e) => setCustomGoalValue(parseInt(e.target.value))}
-                                        className={styles.input}
-                                    />
-                                </div>
-                            </div>
-                            <button className="btn btn-primary w-full" onClick={handleCreateCustomGoal}>
-                                Create Custom Goal
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Active Goals Section */}
-            {goals.length > 0 && (
-                <div className={styles.section}>
-                    <h2 className={styles.sectionTitle}>🎯 Active Community Goals</h2>
-                    <div className={styles.goalsGrid}>
-                        {goals.map(goal => (
-                            <div key={goal.id} className={styles.goalCard}>
-                                <div className={styles.goalHeader}>
-                                    <h3>{goal.title}</h3>
-                                    <span className={styles.goalBadge}>{goal.participantsCompleted.length} ✓</span>
-                                </div>
-                                <p className={styles.goalDesc}>{goal.description}</p>
-                                <div className={styles.participantsRow}>
-                                    {goal.participantsCompleted.map((uid) => {
-                                        const member = sortedMembers.find(m => m.id === uid);
-                                        return (
-                                            <div key={uid} className={styles.participantTag}>
-                                                <span className={styles.checkIcon}>✓</span>
-                                                {uid === user?.id ? 'You' : member?.name || 'User'}
-                                            </div>
-                                        );
-                                    })}
-                                    {goal.participantsCompleted.length === 0 && (
-                                        <span className={styles.emptyParticipants}>Be the first to complete!</span>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Main Content Grid */}
-            <div className={styles.grid}>
-                {/* Leaderboard */}
-                <div className="card">
-                    <h2 className={styles.cardTitle}>🏆 Leaderboard</h2>
-                    <div className={styles.leaderboard}>
-                        {sortedMembers.slice(0, 10).map((member, index) => (
-                            <div key={member.id} className={styles.leaderRow}>
-                                <div className={styles.rank}>#{index + 1}</div>
-                                <div className={styles.avatar}>
-                                    {member.name.charAt(0)}
-                                </div>
-                                <div className={styles.info}>
-                                    <div className={styles.name}>
-                                        {member.name}
-                                        {member.id === user?.id && <span className={styles.youTag}>(You)</span>}
-                                    </div>
-                                    <div className={styles.stats}>
-                                        {member.pagesRead} pages • {member.versesRead || 0} verses
-                                    </div>
-                                </div>
-                                {index === 0 && <span className={styles.crown}>👑</span>}
-                                {index === 1 && <span className={styles.medal}>🥈</span>}
-                                {index === 2 && <span className={styles.medal}>🥉</span>}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Activity Feed */}
-                <div className="card">
-                    <h2 className={styles.cardTitle}>📊 Live Activity & AI Insights</h2>
-                    <div className={styles.feed}>
-                        {activities.slice(0, 15).map((activity) => (
-                            <div
-                                key={activity.id}
-                                className={`${styles.feedItem} ${activity.isAiAnalysis ? styles.aiItem : ''}`}
-                            >
-                                <div className={styles.feedAvatar} style={activity.isAiAnalysis ? { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' } : {}}>
-                                    {activity.isAiAnalysis ? '🤖' : activity.userName.charAt(0)}
-                                </div>
-                                <div className={styles.feedContent}>
-                                    <p>
-                                        <strong>{activity.userName}</strong> {activity.action}
-                                    </p>
-                                    <span className={styles.timestamp}>{activity.timestamp}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Group Chat */}
-                <div className="card">
-                    <h2 className={styles.cardTitle}>💬 Group Discussion (AI Facilitated)</h2>
-                    <div className={styles.chatContainer}>
-                        <div className={styles.messageList}>
-                            {chatMessages.map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    className={`${styles.messageItem} ${msg.isAi ? styles.aiMessage : ''} ${msg.userId === user?.id ? styles.ownMessage : ''}`}
-                                >
-                                    <div className={styles.messageHeader}>
-                                        <span className={styles.messageUser}>{msg.userName}</span>
-                                        <span className={styles.messageTime}>{msg.timestamp}</span>
-                                    </div>
-                                    <div className={styles.messageText}>{msg.text}</div>
-                                </div>
+                        <div className={styles.presetGoals}>
+                            {PRESET_GOALS.map((preset, idx) => (
+                                <button key={idx} className={styles.presetGoalBtn} onClick={() => handleSelectPresetGoal(preset)}>
+                                    <h4>{preset.title}</h4>
+                                    <p>{preset.description}</p>
+                                </button>
                             ))}
                         </div>
-                        <form className={styles.chatInputRow} onSubmit={handleSendMessage}>
-                            <input
-                                type="text"
-                                placeholder="Message your group..."
-                                value={chatText}
-                                onChange={(e) => setChatText(e.target.value)}
-                                className={styles.chatInput}
-                            />
-                            <button type="submit" className="btn btn-primary">Send</button>
-                        </form>
                     </div>
                 </div>
-            </div>
+            )}
+
+            {showJoinByCodeModal && (
+                <div className={styles.modal} onClick={() => setShowJoinByCodeModal(false)}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>Join Circle</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowJoinByCodeModal(false)}>×</button>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Enter invite code..."
+                            value={inviteCode}
+                            onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                            className={styles.input}
+                        />
+                        <button className="btn btn-primary" onClick={handleJoinByCode}>Join</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

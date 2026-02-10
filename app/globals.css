@@ -160,13 +160,68 @@ a:hover {
   color: var(--primary-hover);
 }
 
+/* Unified Button Component */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  gap: 0.5rem;
+  width: auto;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 95, 78, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .btn {
+    width: 100%;
+    /* Force full-width buttons on mobile for UX */
+    padding: 1rem;
+    font-size: 1.125rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+}
+
 /* Global Container System */
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
-  /* Reduced for mobile edge-to-edge feel */
 }
 
 @media (min-width: 768px) {
