@@ -1,0 +1,127 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.icon {
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+}
+
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 80px;
+}
+
+.progressBar {
+    flex: 1;
+    height: 6px;
+    background-color: var(--card-border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: 999px;
+    transition: width 0.5s ease;
+}
+
+.progressText {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 3ch;
+    text-align: right;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: var(--background);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.item:hover {
+    border-color: var(--primary);
+    background-color: rgba(var(--primary-rgb), 0.05);
+    /* Needs fallback or rgb var */
+}
+
+.checkCircle {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--card-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.item.completed .checkCircle {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.itemContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.itemLabel {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    transition: color 0.2s ease;
+}
+
+.item.completed .itemLabel {
+    color: var(--primary);
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+
+.itemSubLabel {
+    font-size: 0.75rem;
+    color: var(--foreground);
+    opacity: 0.6;
+}
