@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Activity, GroupGoal, Group, PRESET_GOALS, SOMALI_AI_MESSAGES, ChatMessage } from '@/types';
+import { User, Activity, GroupGoal, Group, PRESET_GOALS, SOMALI_AI_MESSAGES, ChatMessage, DailyHabits } from '@/types';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface LogData {
@@ -19,6 +19,7 @@ interface SocialContextType {
     activities: Activity[];
     goals: GroupGoal[];
     chatMessages: ChatMessage[];
+    todayHabits: DailyHabits;
     sendChatMessage: (text: string) => void;
     setUserGoal: (pages: number) => void;
     logProgress: (data: LogData) => void;
@@ -28,6 +29,7 @@ interface SocialContextType {
     signOut: () => void;
     createGroup: (name: string, description: string, isPublic: boolean) => void;
     addGoal: (goal: Omit<GroupGoal, 'id' | 'groupId' | 'participantsCompleted' | 'postedBy'>) => void;
+    updateHabits: (habits: Partial<DailyHabits>) => void;
 }
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined);
@@ -43,6 +45,16 @@ const GUEST_USER: User = {
     lastActive: 'Just now'
 };
 
+const DEFAULT_HABITS: DailyHabits = {
+    fajr: false,
+    dhuhr: false,
+    asr: false,
+    maghrib: false,
+    isha: false,
+    isFasting: false,
+    note: ''
+};
+
 export function SocialProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(GUEST_USER);
     const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
@@ -51,6 +63,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     const [goals, setGoals] = useState<GroupGoal[]>([]);
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [groupMembers, setGroupMembers] = useState<User[]>([]);
+    const [todayHabits, setTodayHabits] = useState<DailyHabits>(DEFAULT_HABITS);
 
     const currentGroupGoals = goals.filter(g => g.groupId === currentGroup?.id);
     const currentGroupActivities = activities.filter(a => a.groupId === currentGroup?.id);
@@ -64,6 +77,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             if (session?.user) {
                 await fetchProfileOrCreate(session.user);
                 await fetchGroups();
+                await fetchTodayHabits(session.user.id);
             }
         };
 
@@ -73,9 +87,11 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             if (session?.user) {
                 await fetchProfileOrCreate(session.user);
                 await fetchGroups();
+                await fetchTodayHabits(session.user.id);
             } else {
                 setUser(GUEST_USER);
                 setCurrentGroup(null);
+                setTodayHabits(DEFAULT_HABITS);
             }
         });
 
@@ -152,12 +168,54 @@ export function SocialProvider({ children }: { children: ReactNode }) {
                 name: data.name,
                 pagesRead: data.pages_read,
                 versesRead: data.verses_read,
-                completedSurahs: data.completed_surahs,
+                completedSurahs: data.completed_surahs ?? [],
                 goal: data.goal,
                 streak: data.streak,
                 lastActive: data.last_active
             });
         }
+    };
+
+    const fetchTodayHabits = async (userId: string) => {
+        const today = new Date().toISOString().split('T')[0];
+        const { data } = await supabase
+            .from('daily_habits')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('date', today)
+            .maybeSingle();
+
+        if (data) {
+            setTodayHabits({
+                fajr: data.fajr,
+                dhuhr: data.dhuhr,
+                asr: data.asr,
+                maghrib: data.maghrib,
+                isha: data.isha,
+                isFasting: data.is_fasting,
+                note: data.note || ''
+            });
+        }
+    };
+
+    const updateHabits = async (updates: Partial<DailyHabits>) => {
+        const newHabits = { ...todayHabits, ...updates };
+        setTodayHabits(newHabits);
+
+        if (!user || user.id === '1') return;
+
+        const today = new Date().toISOString().split('T')[0];
+        await supabase.from('daily_habits').upsert({
+            user_id: user.id,
+            date: today,
+            fajr: newHabits.fajr,
+            dhuhr: newHabits.dhuhr,
+            asr: newHabits.asr,
+            maghrib: newHabits.maghrib,
+            isha: newHabits.isha,
+            is_fasting: newHabits.isFasting,
+            note: newHabits.note
+        }, { onConflict: 'user_id,date' });
     };
 
     const fetchGroups = async () => {
@@ -230,7 +288,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
                 name: m.profiles.name,
                 pagesRead: m.profiles.pages_read,
                 versesRead: m.profiles.verses_read,
-                completedSurahs: m.profiles.completed_surahs,
+                completedSurahs: m.profiles.completed_surahs || [],
                 goal: m.profiles.goal,
                 streak: m.profiles.streak,
                 lastActive: m.profiles.last_active
@@ -404,6 +462,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             activities: currentGroupActivities,
             goals: currentGroupGoals,
             chatMessages: currentGroupMessages,
+            todayHabits,
             sendChatMessage,
             setUserGoal,
             logProgress,
@@ -412,7 +471,8 @@ export function SocialProvider({ children }: { children: ReactNode }) {
             leaveGroup,
             signOut,
             createGroup,
-            addGoal
+            addGoal,
+            updateHabits
         }}>
             {children}
         </SocialContext.Provider>

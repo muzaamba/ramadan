@@ -68,9 +68,24 @@ CREATE TABLE chat_messages (
   timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE TABLE daily_habits (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  date DATE DEFAULT CURRENT_DATE,
+  fajr BOOLEAN DEFAULT FALSE,
+  dhuhr BOOLEAN DEFAULT FALSE,
+  asr BOOLEAN DEFAULT FALSE,
+  maghrib BOOLEAN DEFAULT FALSE,
+  isha BOOLEAN DEFAULT FALSE,
+  is_fasting BOOLEAN DEFAULT FALSE,
+  note TEXT,
+  UNIQUE(user_id, date)
+);
+
 -- 2. Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE activities;
 ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE daily_habits;
 
 -- 3. Set up RLS (Row Level Security)
 -- For simplicity in this demo, we'll allow all authenticated users to read/write.
@@ -100,6 +115,9 @@ CREATE POLICY "Authenticated users can post activities" ON activities FOR INSERT
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Messages are viewable by everyone" ON chat_messages FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can post messages" ON chat_messages FOR INSERT WITH CHECK (auth.role() = 'authenticated' OR user_id = 'ai');
+
+ALTER TABLE daily_habits ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their own daily habits" ON daily_habits FOR ALL USING (auth.uid() = user_id);
 ```
 
 ## 3. Environment Variables

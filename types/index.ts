@@ -83,6 +83,16 @@ export const PRESET_GOALS = [
     { title: 'Complete a Juz', description: 'Read 20 pages', targetType: 'pages' as const, targetValue: 20 },
 ];
 
+export interface DailyHabits {
+    fajr: boolean;
+    dhuhr: boolean;
+    asr: boolean;
+    maghrib: boolean;
+    isha: boolean;
+    isFasting: boolean;
+    note: string;
+}
+
 // Somali AI Messages
 export const SOMALI_AI_MESSAGES = {
     surahCompleted: (userName: string, surahName: string, versesCount: number) =>
