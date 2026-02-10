@@ -8,6 +8,7 @@ import styles from './page.module.css';
 export default function Home() {
   const { user, todayHabits, updateHabits } = useSocial();
   const [daysToRamadan, setDaysToRamadan] = useState<number | null>(null);
+  const [isEditingNote, setIsEditingNote] = useState(false);
 
   useEffect(() => {
     // Assume Ramadan 2026 starts Feb 18
@@ -25,31 +26,31 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      {/* Hero Section */}
+      {/* Hero Section - Refined for a premium feel */}
       <section className={styles.hero}>
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.greeting}>
-              <span className={styles.moon}>🌙</span>
-              <p className={styles.ramadanGreeting}>
+            <div className={styles.heroBadge}>
+              <span className={styles.badgeIcon}>✨</span>
+              <span className={styles.badgeText}>
                 {daysToRamadan !== null && daysToRamadan > 0
-                  ? `${daysToRamadan} Days until Ramadan`
-                  : 'Ramadan Mubarak'}
-              </p>
+                  ? `Step into Ramadan in ${daysToRamadan} days`
+                  : 'Blessed Ramadan is Here'}
+              </span>
             </div>
             <h1 className={styles.heroTitle}>
-              Build Meaningful Habits<br />
-              <span className={styles.heroAccent}>Together</span>
+              Elevate Your <span className={styles.gradientText}>Worship</span><br />
+              Experience
             </h1>
             <p className={styles.heroDescription}>
-              Track your daily worship, read Qur'an with friends, and grow spiritually this Ramadan—one day at a time.
+              A soulful space to track your prayers, fasting, and Qur'an journey with a community of believers.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/quran" className="btn btn-primary">
-                {user ? 'Continue Reading' : 'Start Reading'}
+              <Link href="/quran" className={styles.mainCta}>
+                Start My Journey
               </Link>
-              <Link href="/groups" className="btn">
-                {user ? 'View My Group' : 'Explore Groups'}
+              <Link href="/groups" className={styles.secondaryCta}>
+                Explore Circles
               </Link>
             </div>
           </div>
@@ -57,113 +58,128 @@ export default function Home() {
       </section>
 
       <div className="container">
-        <div className={styles.dashboardGrid}>
-          {/* Habit Tracker */}
-          <div className={styles.dashboardCard}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>🤲 Today's Habits</h2>
-              <span className={styles.dateTag}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+        <div className={styles.dashboardContainer}>
+          {/* Daily Rituals Section */}
+          <div className={styles.ritualSection}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Daily Rituals</h2>
+              <p className={styles.sectionSubtitle}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
             </div>
 
-            <div className={styles.habitList}>
-              <div className={styles.habitItem}>
-                <div className={styles.habitLabel}>
-                  <span className={styles.habitIcon}>🥖</span>
-                  <span>Fasting Today?</span>
+            <div className={styles.dashboardGrid}>
+              {/* Fasting Achievement Card */}
+              <div className={`${styles.statusCard} ${todayHabits.isFasting ? styles.statusActive : ''}`} onClick={() => handleHabitToggle('isFasting')}>
+                <div className={styles.statusIcon}>🌙</div>
+                <div className={styles.statusContent}>
+                  <h3>Sawm (Fasting)</h3>
+                  <p>{todayHabits.isFasting ? 'Alhamdulillah, you are fasting today.' : 'Click to log today\'s fast'}</p>
                 </div>
-                <button
-                  className={`${styles.habitCheck} ${todayHabits.isFasting ? styles.checked : ''}`}
-                  onClick={() => handleHabitToggle('isFasting')}
-                >
-                  {todayHabits.isFasting ? '✓ Yes' : 'No'}
-                </button>
-              </div>
-
-              <hr className={styles.divider} />
-
-              <h3 className={styles.subTitle}>5 Daily Prayers</h3>
-              <div className={styles.prayerGrid}>
-                {[
-                  { id: 'fajr', label: 'Fajr' },
-                  { id: 'dhuhr', label: 'Dhuhr' },
-                  { id: 'asr', label: 'Asr' },
-                  { id: 'maghrib', label: 'Maghrib' },
-                  { id: 'isha', label: 'Isha' }
-                ].map((prayer) => (
-                  <button
-                    key={prayer.id}
-                    className={`${styles.prayerBtn} ${todayHabits[prayer.id as keyof typeof todayHabits] ? styles.prayed : ''}`}
-                    onClick={() => handleHabitToggle(prayer.id as any)}
-                  >
-                    {prayer.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className={styles.noteSection}>
-                <h3 className={styles.subTitle}>Daily Reflection</h3>
-                <textarea
-                  className={styles.noteInput}
-                  placeholder="Write a small note about your day..."
-                  value={todayHabits.note}
-                  onChange={(e) => updateHabits({ note: e.target.value })}
-                  rows={3}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Ramadan Calendar */}
-          <div className={styles.dashboardCard}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>📅 Ramadan Calendar</h2>
-              <span className={styles.yearTag}>2026/1447H</span>
-            </div>
-            <p className={styles.calendarDesc}>Track your 30-day journey below</p>
-
-            <div className={styles.calendarGrid}>
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`${styles.calendarDay} ${i < 8 ? styles.pastDay : ''} ${i === 8 ? styles.currentDay : ''}`}
-                >
-                  <span className={styles.dayNumber}>{i + 1}</span>
-                  {i < 8 && <span className={styles.checkIcon}>✓</span>}
+                <div className={styles.statusCheck}>
+                  <div className={styles.checkCircle}>
+                    {todayHabits.isFasting && <span className={styles.checkTick}>✓</span>}
+                  </div>
                 </div>
-              ))}
-            </div>
+              </div>
 
-            <div className={styles.calendarLegend}>
-              <div className={styles.legendItem}><span className={styles.dotPast}></span> Completed</div>
-              <div className={styles.legendItem}><span className={styles.dotCurrent}></span> Today</div>
-              <div className={styles.legendItem}><span className={styles.dotFuture}></span> Remaining</div>
+              {/* Prayer Tracker Card */}
+              <div className={styles.prayerCard}>
+                <div className={styles.cardHeader}>
+                  <h3>Salah (Prayers)</h3>
+                  <span className={styles.counter}>{Object.values(todayHabits).filter(v => v === true).length - (todayHabits.isFasting ? 1 : 0)}/5</span>
+                </div>
+                <div className={styles.prayerGrid}>
+                  {[
+                    { id: 'fajr', label: 'Fajr', time: 'Dawn' },
+                    { id: 'dhuhr', label: 'Dhuhr', time: 'Noon' },
+                    { id: 'asr', label: 'Asr', time: 'Afternoon' },
+                    { id: 'maghrib', label: 'Maghrib', time: 'Sunset' },
+                    { id: 'isha', label: 'Isha', time: 'Night' }
+                  ].map((prayer) => (
+                    <button
+                      key={prayer.id}
+                      className={`${styles.prayerItem} ${todayHabits[prayer.id as keyof typeof todayHabits] ? styles.prayed : ''}`}
+                      onClick={() => handleHabitToggle(prayer.id as any)}
+                    >
+                      <span className={styles.prayerLabel}>{prayer.label}</span>
+                      <span className={styles.prayerTime}>{prayer.time}</span>
+                      <div className={styles.miniCheck}>
+                        {todayHabits[prayer.id as keyof typeof todayHabits] ? '✓' : '+'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reflection Journal Card */}
+              <div className={styles.reflectionCard}>
+                <div className={styles.cardHeader}>
+                  <h3>Spiritual Journal</h3>
+                  {!isEditingNote && todayHabits.note && (
+                    <button className={styles.editBtn} onClick={() => setIsEditingNote(true)}>Edit</button>
+                  )}
+                </div>
+
+                {isEditingNote || !todayHabits.note ? (
+                  <div className={styles.journalInputWrapper}>
+                    <textarea
+                      className={styles.journalInput}
+                      placeholder="Reflect on your day, a verse you read, or a prayer you made..."
+                      value={todayHabits.note}
+                      onChange={(e) => updateHabits({ note: e.target.value })}
+                      onBlur={() => setIsEditingNote(false)}
+                      autoFocus={isEditingNote}
+                    />
+                    {isEditingNote && (
+                      <button className={styles.saveNoteBtn} onClick={() => setIsEditingNote(false)}>Save Reflection</button>
+                    )}
+                  </div>
+                ) : (
+                  <div className={styles.journalDisplay} onClick={() => setIsEditingNote(true)}>
+                    <p className={styles.journalText}>{todayHabits.note}</p>
+                    <span className={styles.journalHint}>Click to add more to your reflection</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Ramadan Journey Calendar */}
+              <div className={styles.calendarCard}>
+                <div className={styles.cardHeader}>
+                  <h3>Ramadan Journey</h3>
+                  <span className={styles.yearLabel}>1447 AH</span>
+                </div>
+                <div className={styles.calendarGrid}>
+                  {Array.from({ length: 30 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`${styles.dayCell} ${i < 8 ? styles.dayPast : ''} ${i === 8 ? styles.dayCurrent : ''}`}
+                      title={`Day ${i + 1} of Ramadan`}
+                    >
+                      {i + 1}
+                      {i < 8 && <div className={styles.dayDot} />}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Features (Legacy but styled) */}
-      <section className={styles.featuresSection}>
+      {/* Bottom Features Branding */}
+      <section className={styles.brandFooter}>
         <div className="container">
-          <div className={styles.featuresHeader}>
-            <h2 className={styles.sectionTitle}>Spiritual Growth Features</h2>
-            <p className={styles.sectionDescription}>Everything you need to stay consistent this month</p>
-          </div>
-          <div className={styles.featuresGrid}>
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>📖</div>
-              <h3 className={styles.featureTitle}>Group Reading</h3>
-              <p className={styles.featureDescription}>Join circles and finish the Quran together with real-time tracking.</p>
+          <div className={styles.footerInner}>
+            <div className={styles.footerStat}>
+              <span className={styles.statVal}>100%</span>
+              <span className={styles.statLab}>Privacy Focused</span>
             </div>
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🤖</div>
-              <h3 className={styles.featureTitle}>AI Analysis</h3>
-              <p className={styles.featureDescription}>Deen AI analyzes your reading patterns and offers encouraging Somali insights.</p>
+            <div className={styles.footerStat}>
+              <span className={styles.statVal}>Cloud</span>
+              <span className={styles.statLab}>Synced Progress</span>
             </div>
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🔥</div>
-              <h3 className={styles.featureTitle}>Dua & Dhikr</h3>
-              <p className={styles.featureDescription}>Integrated tools for daily dhikr and special Ramadan duas.</p>
+            <div className={styles.footerStat}>
+              <span className={styles.statVal}>Somali</span>
+              <span className={styles.statLab}>AI Insights</span>
             </div>
           </div>
         </div>
