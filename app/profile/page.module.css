@@ -2,6 +2,13 @@
     padding: 2rem 0;
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
 .loading {
     padding: 3rem;
     text-align: center;
@@ -10,7 +17,25 @@
 
 .title {
     font-size: 2rem;
-    margin-bottom: 2rem;
+    margin: 0;
+}
+
+.guestBadge {
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.verifiedBadge {
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 .grid {
@@ -105,4 +130,27 @@
     opacity: 0.6;
     font-style: italic;
     padding: 2rem;
+}
+
+.guestCard {
+    background: linear-gradient(135deg, var(--primary-soft) 0%, #d1fae5 100%);
+    border: 1px dashed var(--primary);
+}
+
+.guestContent {
+    text-align: center;
+    padding: 1rem;
+}
+
+.guestContent h3 {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.guestContent p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }

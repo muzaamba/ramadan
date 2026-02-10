@@ -5,10 +5,14 @@ import { useState } from 'react';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
-    const { user, setUserGoal } = useSocial();
+    const { user, setUserGoal, signOut } = useSocial();
     const [goalInput, setGoalInput] = useState(user?.goal || 10);
 
     const handleSaveGoal = () => {
+        if (user?.id === '1') {
+            alert('Please login to save goals permanently!');
+            return;
+        }
         setUserGoal(goalInput);
         alert('Goal updated successfully!');
     };
@@ -19,7 +23,14 @@ export default function ProfilePage() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>My Profile</h1>
+            <div className={styles.header}>
+                <h1 className={styles.title}>My Profile</h1>
+                {user.id === '1' ? (
+                    <span className={styles.guestBadge}>Guest Mode</span>
+                ) : (
+                    <span className={styles.verifiedBadge}>Cloud Synced</span>
+                )}
+            </div>
 
             <div className={styles.grid}>
                 {/* Stats Card */}
@@ -81,6 +92,16 @@ export default function ProfilePage() {
                         <p className={styles.emptyState}>No surahs completed yet. Start reading!</p>
                     )}
                 </div>
+                {/* Guest CTA */}
+                {user.id === '1' && (
+                    <div className={`${styles.card} ${styles.guestCard}`} style={{ gridColumn: '1 / -1' }}>
+                        <div className={styles.guestContent}>
+                            <h3>Want to save your progress?</h3>
+                            <p>You are currently in guest mode. Sign up to sync your progress across devices and join groups!</p>
+                            <a href="/auth" className="btn btn-primary">Create Account</a>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

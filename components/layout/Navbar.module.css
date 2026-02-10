@@ -111,3 +111,44 @@
         right: 0.875rem;
     }
 }
+
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logoutBtn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ef4444;
+    background: none;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.loginBtn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: white;
+    background-color: var(--primary);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-left: 0.5rem;
+}
+
+.loginBtn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
