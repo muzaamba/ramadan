@@ -79,13 +79,11 @@
   border-radius: 999px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+  transition: all 0.2s;
 }
 
 .mainCta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1);
 }
 
 .secondaryCta {
@@ -99,26 +97,20 @@
   transition: all 0.2s;
 }
 
-.secondaryCta:hover {
-  background: #f8fafc;
-}
-
 /* Dashboard Container */
 .dashboardContainer {
-  margin-top: -3rem;
   padding-bottom: 4rem;
 }
 
 .ritualSection {
   background: white;
-  border-radius: 1.5rem;
-  padding: 2.5rem;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
+  padding: 4rem 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .sectionHeader {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .sectionTitle {
@@ -135,7 +127,7 @@
   margin-top: 0.25rem;
 }
 
-/* Professional Card Grid */
+/* Dashboard Grid */
 .dashboardGrid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -148,17 +140,16 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 1.25rem;
-  padding: 1.25rem 1.75rem;
+  padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s;
 }
 
 .statusCard:hover {
   border-color: #10b981;
-  background: white;
 }
 
 .statusActive {
@@ -175,20 +166,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .statusContent h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
   margin: 0;
 }
 
 .statusContent p {
+  font-size: 0.9rem;
   color: #64748b;
   margin: 0.2rem 0 0;
-  font-size: 0.9rem;
 }
 
 .statusCheck {
@@ -203,7 +192,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
 }
 
 .statusActive .checkCircle {
@@ -217,7 +205,7 @@
   font-size: 1.2rem;
 }
 
-/* Prayer Grid Card */
+/* Prayer Card */
 .prayerCard {
   grid-column: span 12;
 }
@@ -233,7 +221,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.25rem;
-  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -241,7 +228,6 @@
   font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: #64748b;
   margin: 0;
 }
@@ -252,7 +238,6 @@
   background: #f1f5f9;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  color: #475569;
 }
 
 .prayerGrid {
@@ -271,8 +256,6 @@
   align-items: center;
   gap: 0.25rem;
   cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
   width: 100%;
 }
 
@@ -280,7 +263,6 @@
   font-weight: 700;
   font-size: clamp(0.75rem, 2vw, 0.95rem);
   color: #1e293b;
-  text-align: center;
 }
 
 .prayerTime {
@@ -288,7 +270,6 @@
   color: #94a3b8;
   font-weight: 600;
   text-transform: uppercase;
-  text-align: center;
 }
 
 .miniCheck {
@@ -315,17 +296,13 @@
   color: white;
 }
 
-.prayerItem.prayed .prayerTime {
-  color: #64748b;
-}
-
 .prayerItem.prayed .miniCheck {
   background: #10b981;
   border-color: #10b981;
   color: white;
 }
 
-/* Reflection Journal Card */
+/* Reflection Card */
 .reflectionCard {
   grid-column: span 12;
   background: #fffcf0;
@@ -363,7 +340,6 @@
   border: none;
   font-family: inherit;
   font-size: 1rem;
-  line-height: 1.6;
   color: #78350f;
   outline: none;
   resize: none;
@@ -377,25 +353,18 @@
   border: none;
   border-radius: 0.75rem;
   font-weight: 600;
-  font-size: 0.875rem;
   cursor: pointer;
-}
-
-.journalDisplay {
-  cursor: pointer;
-  min-height: 120px;
 }
 
 .journalText {
   font-size: 1rem;
   line-height: 1.6;
   color: #451a03;
-  margin: 0;
   font-style: italic;
   white-space: pre-wrap;
 }
 
-/* Ramadan Journey Calendar Card */
+/* Calendar Card */
 .calendarCard {
   grid-column: span 12;
   background: white;
@@ -443,64 +412,59 @@
   background: #ecfdf5;
 }
 
-/* Brand Footer */
+.dayPast {
+  opacity: 0.6;
+}
+
+.dayDot {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 5px;
+  height: 5px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+/* Footer */
 .brandFooter {
   padding: 4rem 0;
   border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
 }
 
 .footerInner {
   display: flex;
   justify-content: center;
-  gap: 4rem;
+  gap: 3rem;
   flex-wrap: wrap;
 }
 
-/* --- MOBILE OPTIMIZATION (Non-Boxed Feel) --- */
+.footerInner a {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Mobile Optimization */
 @media (max-width: 768px) {
-  .page {
-    background-color: white;
-    /* Ensure background matches content for seamless look */
-  }
-
   .hero {
-    padding: 4rem 0 3rem;
+    padding: 4rem 1rem 3rem;
   }
 
-  .dashboardContainer {
-    margin-top: 0;
-    /* Remove negative margin that creates "floating box" look */
-    padding-bottom: 2rem;
+  .heroTitle {
+    font-size: 2.25rem;
   }
 
   .ritualSection {
-    border-radius: 0;
-    /* Clear the box corners for edge-to-edge feel */
-    border-left: none;
-    border-right: none;
-    box-shadow: none;
-    /* Flat look is more modern on mobile */
-    padding: 1.5rem 1rem;
-    background: white;
+    padding: 3rem 0;
   }
 
   .sectionTitle {
     font-size: 1.5rem;
   }
 
-  .statusCard {
-    border-radius: 1rem;
-    padding: 1rem;
-  }
-
-  .statusIcon {
-    width: 3rem;
-    height: 3rem;
-    font-size: 1.5rem;
-  }
-
   .prayerGrid {
-    grid-template-columns: repeat(5, 1fr);
     gap: 0.4rem;
   }
 
@@ -511,7 +475,10 @@
 
   .prayerTime {
     display: none;
-    /* Save vertical space */
+  }
+
+  .prayerLabel {
+    font-size: 0.75rem;
   }
 
   .calendarGrid {
@@ -523,26 +490,24 @@
     height: 4.2rem;
     aspect-ratio: auto;
   }
-
-  .footerInner {
-    gap: 2rem;
-    padding: 0 1rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .heroTitle {
-    font-size: 2.1rem;
-  }
-
-  .heroDescription {
-    font-size: 1rem;
-    padding: 0 1rem;
+  .heroActions {
+    flex-direction: column;
+    align-items: center;
   }
 
   .mainCta,
   .secondaryCta {
     width: 100%;
-    max-width: 320px;
+    max-width: 280px;
+    text-align: center;
+  }
+
+  .footerInner {
+    gap: 1.5rem;
+    flex-direction: column;
+    align-items: center;
   }
 }

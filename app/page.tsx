@@ -53,7 +53,7 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      {/* Hero Section - Full width background, centered content */}
+      {/* Hero Section */}
       <section className={styles.hero}>
         <div className="container">
           <div className={styles.heroContent}>
@@ -84,10 +84,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dashboard Section */}
+      {/* Dashboard Section - Container removed from outer for full-width background on mobile */}
       <div className={styles.dashboardContainer}>
-        <div className="container">
-          <div className={styles.ritualSection}>
+        <div className={styles.ritualSection}>
+          <div className="container">
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Daily Rituals</h2>
               <p className={styles.sectionSubtitle}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
@@ -142,7 +142,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Simple Journal */}
+              {/* Journal Card */}
               <div className={styles.reflectionCard}>
                 <div className={styles.cardHeader}>
                   <h3>Spiritual Journal</h3>
@@ -172,7 +172,7 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Journey Calendar */}
+              {/* Calendar Card */}
               <div className={styles.calendarCard}>
                 <div className={styles.cardHeader}>
                   <h3>Ramadan Journey</h3>
@@ -197,7 +197,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Simple Footer */}
+      {/* Footer */}
       <section className={styles.brandFooter}>
         <div className="container">
           <div className={styles.footerInner}>
