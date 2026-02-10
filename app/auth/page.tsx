@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
@@ -16,6 +16,15 @@ export default function AuthPage() {
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isSupabaseConfigured) {
+            setMessage({
+                type: 'error',
+                text: 'Supabase is not configured yet. If you just added keys to .env.local, you MUST restart your development server (stop it and run npm run dev again).'
+            });
+            return;
+        }
+
         setLoading(true);
         setMessage(null);
 

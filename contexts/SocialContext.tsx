@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Activity, GroupGoal, Group, PRESET_GOALS, SOMALI_AI_MESSAGES, ChatMessage } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface LogData {
     pages: number;
@@ -57,6 +57,8 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     const currentGroupMessages = chatMessages.filter(m => m.groupId === currentGroup?.id);
 
     useEffect(() => {
+        if (!isSupabaseConfigured) return;
+
         const initialize = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
