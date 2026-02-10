@@ -314,9 +314,21 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
     const addGoal = async (goalData: any) => {
         if (!user || !currentGroup) return;
-        const { data } = await supabase.from('goals').insert({
-            ...goalData, group_id: currentGroup.id, posted_by: user.id
+
+        const { data, error } = await supabase.from('goals').insert({
+            title: goalData.title,
+            description: goalData.description,
+            target_type: goalData.targetType,
+            target_value: goalData.targetValue,
+            group_id: currentGroup.id,
+            posted_by: user.id
         }).select().single();
+
+        if (error) {
+            console.error('Error adding goal:', error);
+            alert('Failed to add goal. Please try again.');
+            return;
+        }
 
         if (data) {
             const mapped: GroupGoal = {
