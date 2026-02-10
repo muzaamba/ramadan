@@ -16,6 +16,10 @@ export default function GroupsPage() {
     const [isPublic, setIsPublic] = useState(true);
     const [inviteCode, setInviteCode] = useState('');
     const [copiedCode, setCopiedCode] = useState(false);
+    const [customGoalTitle, setCustomGoalTitle] = useState('');
+    const [customGoalDesc, setCustomGoalDesc] = useState('');
+    const [customGoalType, setCustomGoalType] = useState<'surah' | 'pages'>('pages');
+    const [customGoalValue, setCustomGoalValue] = useState(1);
 
     const sortedMembers = [...groupMembers, ...(user ? [user] : [])]
         .filter((v, i, a) => a.findIndex(v2 => (v2.id === v.id)) === i)
@@ -34,6 +38,20 @@ export default function GroupsPage() {
     const handleSelectPresetGoal = (preset: typeof PRESET_GOALS[0]) => {
         addGoal(preset);
         setShowGoalModal(false);
+    };
+
+    const handleCreateCustomGoal = () => {
+        if (customGoalTitle.trim()) {
+            addGoal({
+                title: customGoalTitle,
+                description: customGoalDesc || 'Personal goal for the group',
+                targetType: customGoalType,
+                targetValue: customGoalValue || 1,
+            });
+            setCustomGoalTitle('');
+            setCustomGoalDesc('');
+            setShowGoalModal(false);
+        }
     };
 
     const handleCopyInviteLink = () => {
@@ -104,7 +122,10 @@ export default function GroupsPage() {
             {showInviteModal && currentGroup && (
                 <div className={styles.modal} onClick={() => setShowInviteModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <h2>📤 Share Group Invite</h2>
+                        <div className={styles.modalHeader}>
+                            <h2>📤 Share Group Invite</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowInviteModal(false)}>×</button>
+                        </div>
                         <p className={styles.modalDesc}>Share this link or code with friends to invite them to {currentGroup.name}</p>
 
                         <div className={styles.inviteBox}>
@@ -143,7 +164,10 @@ export default function GroupsPage() {
             {showJoinByCodeModal && (
                 <div className={styles.modal} onClick={() => setShowJoinByCodeModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <h2>🔗 Join Group by Code</h2>
+                        <div className={styles.modalHeader}>
+                            <h2>🔗 Join Group by Code</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowJoinByCodeModal(false)}>×</button>
+                        </div>
                         <p className={styles.modalDesc}>Enter the invite code shared by your friend</p>
                         <input
                             type="text"
@@ -164,7 +188,10 @@ export default function GroupsPage() {
             {showGroupModal && (
                 <div className={styles.modal} onClick={() => setShowGroupModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <h2>Manage Groups</h2>
+                        <div className={styles.modalHeader}>
+                            <h2>Manage Groups</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowGroupModal(false)}>×</button>
+                        </div>
 
                         <div className={styles.section}>
                             <h3>Available Groups</h3>
@@ -235,19 +262,79 @@ export default function GroupsPage() {
             {showGoalModal && (
                 <div className={styles.modal} onClick={() => setShowGoalModal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <h2>Select a Goal</h2>
-                        <p className={styles.modalDesc}>Choose from our curated goals for your group</p>
-                        <div className={styles.presetGoals}>
-                            {PRESET_GOALS.map((preset, idx) => (
-                                <button
-                                    key={idx}
-                                    className={styles.presetGoalBtn}
-                                    onClick={() => handleSelectPresetGoal(preset)}
-                                >
-                                    <h4>{preset.title}</h4>
-                                    <p>{preset.description}</p>
-                                </button>
-                            ))}
+                        <div className={styles.modalHeader}>
+                            <h2>Post a New Goal</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowGoalModal(false)}>×</button>
+                        </div>
+
+                        <div className={styles.section}>
+                            <h3>Pre-made Goals</h3>
+                            <p className={styles.modalDesc}>Quickly select from our recommended Ramadan goals</p>
+                            <div className={styles.presetGoals}>
+                                {PRESET_GOALS.map((preset, idx) => (
+                                    <button
+                                        key={idx}
+                                        className={styles.presetGoalBtn}
+                                        onClick={() => handleSelectPresetGoal(preset)}
+                                    >
+                                        <h4>{preset.title}</h4>
+                                        <p>{preset.description}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <hr className={styles.divider} />
+
+                        <div className={styles.section}>
+                            <h3>Create Custom Goal</h3>
+                            <p className={styles.modalDesc}>Define a specific goal for your group members</p>
+                            <div className={styles.formGroup}>
+                                <label>Goal Title</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Read Surah Ar-Rahman"
+                                    value={customGoalTitle}
+                                    onChange={(e) => setCustomGoalTitle(e.target.value)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Description</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Let's all read this beautiful Surah together"
+                                    value={customGoalDesc}
+                                    onChange={(e) => setCustomGoalDesc(e.target.value)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.formRow}>
+                                <div className={styles.formGroup} style={{ flex: 1 }}>
+                                    <label>Goal Type</label>
+                                    <select
+                                        value={customGoalType}
+                                        onChange={(e) => setCustomGoalType(e.target.value as 'surah' | 'pages')}
+                                        className={styles.input}
+                                    >
+                                        <option value="pages">Pages</option>
+                                        <option value="surah">Specific Surah ID</option>
+                                    </select>
+                                </div>
+                                <div className={styles.formGroup} style={{ flex: 1 }}>
+                                    <label>{customGoalType === 'pages' ? 'Page Count' : 'Surah ID'}</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={customGoalValue}
+                                        onChange={(e) => setCustomGoalValue(parseInt(e.target.value))}
+                                        className={styles.input}
+                                    />
+                                </div>
+                            </div>
+                            <button className="btn btn-primary w-full" onClick={handleCreateCustomGoal}>
+                                Create Custom Goal
+                            </button>
                         </div>
                     </div>
                 </div>
