@@ -5,7 +5,7 @@
 
 /* Hero Design Refinement */
 .hero {
-  padding: 6rem 0 5rem;
+  padding: 5rem 0 4rem;
   background: radial-gradient(circle at top right, #ecfdf5, transparent),
     radial-gradient(circle at bottom left, #fffbea, transparent);
   text-align: center;
@@ -68,10 +68,11 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .mainCta {
-  padding: 1.125rem 2.5rem;
+  padding: 1rem 2rem;
   background: #0f172a;
   color: white;
   border-radius: 999px;
@@ -87,7 +88,7 @@
 }
 
 .secondaryCta {
-  padding: 1.125rem 2.5rem;
+  padding: 1rem 2rem;
   background: white;
   color: #0f172a;
   border: 1px solid #e2e8f0;
@@ -103,24 +104,24 @@
 
 /* Dashboard Container */
 .dashboardContainer {
-  margin-top: -4rem;
-  padding-bottom: 6rem;
+  margin-top: -3rem;
+  padding-bottom: 4rem;
 }
 
 .ritualSection {
   background: white;
-  border-radius: 2rem;
-  padding: 3rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  border-radius: 1.5rem;
+  padding: 2.5rem 1.5rem;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
   border: 1px solid #f1f5f9;
 }
 
 .sectionHeader {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .sectionTitle {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
@@ -129,7 +130,7 @@
 .sectionSubtitle {
   color: #64748b;
   font-weight: 500;
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-top: 0.25rem;
 }
 
@@ -140,16 +141,16 @@
   gap: 1.5rem;
 }
 
-/* Status Card - Elevated Fasting UI */
+/* Status Card */
 .statusCard {
   grid-column: span 12;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 1.5rem;
-  padding: 1.5rem 2rem;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -157,7 +158,6 @@
 .statusCard:hover {
   border-color: #10b981;
   background: white;
-  transform: scale(1.01);
 }
 
 .statusActive {
@@ -166,19 +166,19 @@
 }
 
 .statusIcon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   background: white;
-  width: 4rem;
-  height: 4rem;
+  width: 3.5rem;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .statusContent h3 {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
@@ -186,8 +186,8 @@
 
 .statusContent p {
   color: #64748b;
-  margin: 0.25rem 0 0;
-  font-size: 0.95rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
 }
 
 .statusCheck {
@@ -195,8 +195,8 @@
 }
 
 .checkCircle {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 2px solid #cbd5e1;
   border-radius: 50%;
   display: flex;
@@ -213,7 +213,7 @@
 .checkTick {
   color: white;
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 /* Prayer Grid Card */
@@ -221,13 +221,9 @@
   grid-column: span 12;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
   .prayerCard {
     grid-column: span 7;
-  }
-
-  .statusCard {
-    grid-column: span 12;
   }
 }
 
@@ -236,10 +232,12 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .cardHeader h3 {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -248,10 +246,10 @@
 }
 
 .counter {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 700;
   background: #f1f5f9;
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 999px;
   color: #475569;
 }
@@ -259,13 +257,13 @@
 .prayerGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .prayerItem {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  padding: 1.25rem 0.5rem;
+  padding: 1rem 0.25rem;
   border-radius: 1rem;
   display: flex;
   flex-direction: column;
@@ -274,32 +272,35 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  width: 100%;
 }
 
 .prayerLabel {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
   color: #1e293b;
+  text-align: center;
 }
 
 .prayerTime {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: #94a3b8;
   font-weight: 600;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .miniCheck {
-  margin-top: 0.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
+  margin-top: 0.4rem;
+  width: 1.125rem;
+  height: 1.125rem;
   background: white;
   border: 1px solid #cbd5e1;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 800;
   color: #94a3b8;
 }
@@ -326,13 +327,13 @@
 /* Reflection Journal Card */
 .reflectionCard {
   grid-column: span 12;
-  background: #fdf6e3;
-  border: 1px solid #eee0b1;
-  border-radius: 1.5rem;
-  padding: 1.5rem;
+  background: #fffcf0;
+  border: 1px solid #f2eabf;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
   .reflectionCard {
     grid-column: span 5;
   }
@@ -356,12 +357,12 @@
 
 .journalInput {
   width: 100%;
-  min-height: 120px;
+  min-height: 100px;
   background: transparent;
   border: none;
   font-family: inherit;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
   color: #78350f;
   outline: none;
   resize: none;
@@ -369,24 +370,24 @@
 
 .saveNoteBtn {
   align-self: flex-end;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   background: #b45309;
   color: white;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
 .journalDisplay {
   cursor: pointer;
-  min-height: 120px;
+  min-height: 100px;
 }
 
 .journalText {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
   color: #451a03;
   margin: 0;
   font-style: italic;
@@ -395,45 +396,45 @@
 
 .journalHint {
   display: block;
-  margin-top: 1rem;
-  font-size: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
   color: #92400e;
   font-weight: 500;
   opacity: 0.6;
 }
 
-/* Ramadan Journey Calendar Card - Updated for Dual Dates */
+/* Ramadan Journey Calendar Card */
 .calendarCard {
   grid-column: span 12;
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 1.5rem;
   padding: 1.5rem;
-  margin-top: 1rem;
 }
 
 .calendarGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .dayCell {
   height: 4.5rem;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   transition: all 0.2s;
+  padding: 0.25rem;
 }
 
 .hijriDay {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #1e293b;
   line-height: 1;
@@ -441,56 +442,59 @@
 
 .gregorianDate {
   font-size: 0.65rem;
-  font-weight: 600;
-  color: #64748b;
+  font-weight: 800;
+  color: #059669;
+  /* Solid Emerald for better visibility */
   text-transform: uppercase;
   margin-top: 0.25rem;
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 .dayPast {
   background: #f1f5f9;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .dayPast .hijriDay {
   color: #94a3b8;
 }
 
+.dayPast .gregorianDate {
+  color: #94a3b8;
+}
+
 .dayDot {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 6px;
-  height: 6px;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 5px;
+  height: 5px;
   background: #10b981;
   border-radius: 50%;
 }
 
 .dayCurrent {
-  border-color: #10b981;
+  border: 2px solid #10b981;
   background: #ecfdf5;
-  transform: scale(1.05);
-  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 .dayCurrent .hijriDay {
   color: #065f46;
 }
 
-.dayCurrent .gregorianDate {
-  color: #059669;
-}
-
 /* Brand Footer */
 .brandFooter {
-  padding: 4rem 0;
+  padding: 3rem 0;
   border-top: 1px solid #f1f5f9;
 }
 
 .footerInner {
   display: flex;
   justify-content: center;
-  gap: 4rem;
+  gap: 2rem;
   flex-wrap: wrap;
 }
 
@@ -499,41 +503,99 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  min-width: 100px;
 }
 
 .statVal {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #0f172a;
 }
 
 .statLab {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
 }
 
-@media (max-width: 640px) {
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .hero {
+    padding: 4rem 1rem 3rem;
+  }
+
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+
+  .dashboardContainer {
+    margin-top: -2rem;
+  }
+
   .ritualSection {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .dashboardGrid {
+    gap: 1rem;
   }
 
   .prayerGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+  }
+
+  .prayerTime {
+    display: none;
+  }
+
+  .prayerItem {
+    padding: 0.85rem 0.1rem;
+  }
+
+  .prayerLabel {
+    font-size: 0.75rem;
   }
 
   .calendarGrid {
-    grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
   }
 
   .dayCell {
-    height: 3.5rem;
+    height: 4.5rem;
+    /* Maintain height for dual dates */
   }
 
   .hijriDay {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    /* Keep readable */
+  }
+
+  .gregorianDate {
+    font-size: 0.65rem;
+    /* Keep readable */
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendarGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mainCta,
+  .secondaryCta {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
   }
 }

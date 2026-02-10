@@ -11,7 +11,11 @@ export default function Home() {
   const [isEditingNote, setIsEditingNote] = useState(false);
 
   // Ramadan 2026 starts approx Feb 18
-  const ramadanStartDate = useMemo(() => new Date('2026-02-18'), []);
+  const ramadanStartDate = useMemo(() => {
+    const d = new Date('2026-02-18');
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
   useEffect(() => {
     const today = new Date();
@@ -91,7 +95,11 @@ export default function Home() {
 
             <div className={styles.dashboardGrid}>
               {/* Fasting Achievement Card */}
-              <div className={`${styles.statusCard} ${todayHabits.isFasting ? styles.statusActive : ''}`} onClick={() => handleHabitToggle('isFasting')}>
+              <div
+                className={`${styles.statusCard} ${todayHabits.isFasting ? styles.statusActive : ''}`}
+                onClick={() => handleHabitToggle('isFasting')}
+                role="button" aria-pressed={todayHabits.isFasting}
+              >
                 <div className={styles.statusIcon}>🌙</div>
                 <div className={styles.statusContent}>
                   <h3>Sawm (Fasting)</h3>
@@ -108,14 +116,14 @@ export default function Home() {
               <div className={styles.prayerCard}>
                 <div className={styles.cardHeader}>
                   <h3>Salah (Prayers)</h3>
-                  <span className={styles.counter}>{Object.values(todayHabits).filter(v => v === true).length - (todayHabits.isFasting ? 1 : 0)}/5</span>
+                  <span className={styles.counter}>{Object.entries(todayHabits).filter(([k, v]) => ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'].includes(k) && v === true).length}/5</span>
                 </div>
                 <div className={styles.prayerGrid}>
                   {[
                     { id: 'fajr', label: 'Fajr', time: 'Dawn' },
                     { id: 'dhuhr', label: 'Dhuhr', time: 'Noon' },
-                    { id: 'asr', label: 'Asr', time: 'Afternoon' },
-                    { id: 'maghrib', label: 'Maghrib', time: 'Sunset' },
+                    { id: 'asr', label: 'Asr', time: 'After' },
+                    { id: 'maghrib', label: 'Maghr', time: 'Sun' },
                     { id: 'isha', label: 'Isha', time: 'Night' }
                   ].map((prayer) => (
                     <button
@@ -170,6 +178,9 @@ export default function Home() {
                   <h3>Ramadan Journey</h3>
                   <span className={styles.yearLabel}>1447 AH</span>
                 </div>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem' }}>
+                  Each cell shows the <strong>Hijri Day</strong> and its <strong>Gregorian Date</strong>.
+                </p>
                 <div className={styles.calendarGrid}>
                   {calendarDays.map((day) => (
                     <div
@@ -195,15 +206,15 @@ export default function Home() {
           <div className={styles.footerInner}>
             <div className={styles.footerStat}>
               <span className={styles.statVal}>100%</span>
-              <span className={styles.statLab}>Privacy Focused</span>
+              <span className={styles.statLab}>Privacy</span>
             </div>
             <div className={styles.footerStat}>
-              <span className={styles.statVal}>Cloud</span>
-              <span className={styles.statLab}>Synced Progress</span>
+              <span className={styles.statVal}>Live</span>
+              <span className={styles.statLab}>Synced</span>
             </div>
             <div className={styles.footerStat}>
-              <span className={styles.statVal}>Somali</span>
-              <span className={styles.statLab}>AI Insights</span>
+              <span className={styles.statVal}>AI</span>
+              <span className={styles.statLab}>Insights</span>
             </div>
           </div>
         </div>
