@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSocial } from '@/contexts/SocialContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -10,13 +10,14 @@ export default function Home() {
   const [daysToRamadan, setDaysToRamadan] = useState<number | null>(null);
   const [isEditingNote, setIsEditingNote] = useState(false);
 
+  // Ramadan 2026 starts approx Feb 18
+  const ramadanStartDate = useMemo(() => new Date('2026-02-18'), []);
+
   useEffect(() => {
-    // Assume Ramadan 2026 starts Feb 18
-    const ramadanDate = new Date('2026-02-18');
     const today = new Date();
-    const diff = Math.ceil((ramadanDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const diff = Math.ceil((ramadanStartDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     setDaysToRamadan(diff > 0 ? diff : 0);
-  }, []);
+  }, [ramadanStartDate]);
 
   const handleHabitToggle = (habit: keyof typeof todayHabits) => {
     if (typeof todayHabits[habit] === 'boolean') {
@@ -24,9 +25,31 @@ export default function Home() {
     }
   };
 
+  const calendarDays = useMemo(() => {
+    const days = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(ramadanStartDate);
+      date.setDate(date.getDate() + i);
+
+      const isToday = date.getTime() === today.getTime();
+      const isPast = date.getTime() < today.getTime();
+
+      days.push({
+        ramadanDay: i + 1,
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        isToday,
+        isPast
+      });
+    }
+    return days;
+  }, [ramadanStartDate]);
+
   return (
     <div className={styles.page}>
-      {/* Hero Section - Refined for a premium feel */}
+      {/* Hero Section */}
       <section className={styles.hero}>
         <div className="container">
           <div className={styles.heroContent}>
@@ -148,14 +171,15 @@ export default function Home() {
                   <span className={styles.yearLabel}>1447 AH</span>
                 </div>
                 <div className={styles.calendarGrid}>
-                  {Array.from({ length: 30 }).map((_, i) => (
+                  {calendarDays.map((day) => (
                     <div
-                      key={i}
-                      className={`${styles.dayCell} ${i < 8 ? styles.dayPast : ''} ${i === 8 ? styles.dayCurrent : ''}`}
-                      title={`Day ${i + 1} of Ramadan`}
+                      key={day.ramadanDay}
+                      className={`${styles.dayCell} ${day.isPast ? styles.dayPast : ''} ${day.isToday ? styles.dayCurrent : ''}`}
+                      title={`Day ${day.ramadanDay} of Ramadan (${day.date})`}
                     >
-                      {i + 1}
-                      {i < 8 && <div className={styles.dayDot} />}
+                      <span className={styles.hijriDay}>{day.ramadanDay}</span>
+                      <span className={styles.gregorianDate}>{day.date}</span>
+                      {day.isPast && <div className={styles.dayDot} />}
                     </div>
                   ))}
                 </div>

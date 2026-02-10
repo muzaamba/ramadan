@@ -327,7 +327,6 @@
 .reflectionCard {
   grid-column: span 12;
   background: #fdf6e3;
-  /* Soft cream/paper feel */
   border: 1px solid #eee0b1;
   border-radius: 1.5rem;
   padding: 1.5rem;
@@ -403,7 +402,7 @@
   opacity: 0.6;
 }
 
-/* Ramadan Journey Calendar Card */
+/* Ramadan Journey Calendar Card - Updated for Dual Dates */
 .calendarCard {
   grid-column: span 12;
   background: white;
@@ -413,53 +412,73 @@
   margin-top: 1rem;
 }
 
-.yearLabel {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #94a3b8;
-}
-
 .calendarGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
-  gap: 0.5rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 .dayCell {
-  aspect-ratio: 1;
+  height: 4.5rem;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #94a3b8;
   position: relative;
+  transition: all 0.2s;
+}
+
+.hijriDay {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.gregorianDate {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
 }
 
 .dayPast {
   background: #f1f5f9;
-  color: #475569;
+  opacity: 0.7;
+}
+
+.dayPast .hijriDay {
+  color: #94a3b8;
 }
 
 .dayDot {
   position: absolute;
-  bottom: 0.4rem;
-  width: 4px;
-  height: 4px;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 6px;
+  height: 6px;
   background: #10b981;
   border-radius: 50%;
 }
 
 .dayCurrent {
   border-color: #10b981;
-  background: white;
-  color: #10b981;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
-  font-size: 1rem;
+  background: #ecfdf5;
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+}
+
+.dayCurrent .hijriDay {
+  color: #065f46;
+}
+
+.dayCurrent .gregorianDate {
+  color: #059669;
 }
 
 /* Brand Footer */
@@ -506,11 +525,15 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .footerInner {
-    gap: 2rem;
+  .calendarGrid {
+    grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
   }
 
-  .heroTitle {
-    font-size: 2.25rem;
+  .dayCell {
+    height: 3.5rem;
+  }
+
+  .hijriDay {
+    font-size: 1rem;
   }
 }
