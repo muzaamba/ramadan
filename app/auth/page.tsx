@@ -16,15 +16,14 @@ export default function AuthPage() {
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!isSupabaseConfigured) {
-            setMessage({
-                type: 'error',
-                text: 'Supabase is not configured yet. If you just added keys to .env.local, you MUST restart your development server (stop it and run npm run dev again).'
-            });
-            return;
-        }
-
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        console.log('--- Auth Debug ---');
+        console.log('URL exists:', !!url);
+        console.log('URL value:', url);
+        console.log('Key exists:', !!key);
+        console.log('Key length:', key?.length);
+        console.log('------------------');
         setLoading(true);
         setMessage(null);
 
